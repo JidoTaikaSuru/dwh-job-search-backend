@@ -1,12 +1,12 @@
+import { createRequire } from "module";
+import { decode, encode } from "@ipld/dag-json";
+import dotenv from "dotenv";
+import * as ethers from "ethers";
 import { FastifyInstance, FastifyServerOptions } from "fastify";
 import { sha256 } from "hash-wasm";
+import * as jose from "jose";
 import { supabaseClient } from "../index.js";
 
-import * as jose from "jose";
-import { decode, encode } from "@ipld/dag-json";
-import { createRequire } from "module";
-import * as ethers from "ethers";
-import dotenv from "dotenv";
 import { registerDataSubscriptionEndpoint } from "./register.js";
 
 const require = createRequire(import.meta.url);

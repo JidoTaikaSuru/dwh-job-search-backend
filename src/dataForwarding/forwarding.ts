@@ -1,9 +1,9 @@
+import { createRequire } from "module";
+import dotenv from "dotenv";
+import * as ethers from "ethers";
 import { FastifyInstance, FastifyServerOptions } from "fastify";
 
 import * as jose from "jose";
-import { createRequire } from "module";
-import * as ethers from "ethers";
-import dotenv from "dotenv";
 
 const require = createRequire(import.meta.url);
 const keyto = require("@trust/keyto"); //this is the winner

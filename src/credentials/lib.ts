@@ -1,6 +1,6 @@
+import { promises as dns } from "dns";
 import { VerifiableCredential } from "@veramo/core";
 import { agent } from "../setup.js";
-import { promises as dns } from "dns";
 
 export const storeCredential = async (
   verifiableCredential: VerifiableCredential,

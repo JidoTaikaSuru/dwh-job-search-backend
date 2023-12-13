@@ -1,7 +1,7 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 import { argon2Verify } from "hash-wasm";
-import { DEFAULT_IDENTIFIER_SCHEMA, agent } from "../setup.js";
 import { supabaseClient } from "../index.js";
+import { DEFAULT_IDENTIFIER_SCHEMA, agent } from "../setup.js";
 
 export const registerDataSubscriptionEndpoint = async (
     request: FastifyRequest,

@@ -1,9 +1,9 @@
 import { createClient } from "@supabase/supabase-js";
-import { protocols } from "./protocols.js";
-import { Web5, Web5ConnectOptions } from "@web5/api";
 import { ProtocolDefinition } from "@tbd54566975/dwn-sdk-js";
-import { DwnClient } from "./web5Client.js";
+import { Web5, Web5ConnectOptions } from "@web5/api";
 import { Database } from "../__generated__/supabase-types.js";
+import { protocols } from "./protocols.js";
+import { DwnClient } from "./web5Client.js";
 
 export const did_db_table = "dwn_did_registry_2";
 export const DEBUGGING = false;

@@ -1,8 +1,8 @@
-import { FastifyInstance, FastifyServerOptions } from "fastify";
-import { jwtAuthentication, supabaseClient } from "../index.js";
-import { IVerifiableCredential } from "@sphereon/ssi-types";
-import { IPresentationDefinition } from "@sphereon/pex";
-import { loadUserDataPlaceholdersIntoPresentationDefinition } from "./lib.js";
+import { IPresentationDefinition } from '@sphereon/pex';
+import { IVerifiableCredential } from '@sphereon/ssi-types';
+import { FastifyInstance, FastifyServerOptions } from 'fastify';
+import { jwtAuthentication, supabaseClient } from '../index.js';
+import { loadUserDataPlaceholdersIntoPresentationDefinition } from './lib.js';
 
 export type PresentationExchangePostBody = {
   claims: IVerifiableCredential;
@@ -13,55 +13,58 @@ export default async function presentationRoutes(
   server: FastifyInstance,
   options: FastifyServerOptions,
 ) {
-  server.post<{ Body: PresentationExchangePostBody }>("/presentation", {
+  server.post<{ Body: PresentationExchangePostBody }>('/presentation', {
     schema: {
       headers: {
-        type: "object",
+        type: 'object',
         properties: {
-          "x-access-token": { type: "string" },
+          'x-access-token': { type: 'string' },
         },
-        required: ["x-access-token"],
+        required: ['x-access-token'],
       },
       body: {
-        type: "object",
+        type: 'object',
         properties: {
           claims: {
-            type: "array",
+            type: 'array',
           },
           jobListing: {
-            type: "string",
+            type: 'string',
           },
         },
-        required: ["claims", "jobListing"],
+        required: ['claims', 'jobListing'],
       },
     },
     preHandler: jwtAuthentication,
     handler: async (request, reply) => {
       const { jobListing } = request.body;
-      console.log("fetching job listing", jobListing);
+      console.log('fetching job listing', jobListing);
       const { data: jobListingData, error: jobListingError } =
         await supabaseClient
-          .from("job_listings")
-          .select("*")
-          .eq("id", jobListing)
+          .from('job_listings')
+          .select('*')
+          .eq('id', jobListing)
           .single();
       if (jobListingError) {
         return reply.status(500).send(jobListingError);
       }
       if (!jobListingData) {
-        return reply.status(404).send("Job listing not found");
+        return reply.status(404).send('Job listing not found');
       }
-      
-      console.log("jobListingData", jobListingData);
 
-      const presentationDefinition = loadUserDataPlaceholdersIntoPresentationDefinition(
-        // @ts-ignore
-        jobListingData.presentation_definition as IPresentationDefinition,
-        request.user,
+      console.log('jobListingData', jobListingData);
+
+      const presentationDefinition =
+        loadUserDataPlaceholdersIntoPresentationDefinition(
+          // @ts-expect-error this is a shortcut. We know it's an IPresentationDefinition because that's how its stored. Supabase is unaware of typeorm
+          jobListingData.presentation_definition as IPresentationDefinition,
+          request.user,
+        );
+
+      console.log(
+        'presentationDefinition',
+        JSON.stringify(presentationDefinition, null, 2),
       );
-
-
-      console.log("presentationDefinition", JSON.stringify(presentationDefinition, null, 2))
       reply.send(presentationDefinition);
       //   // request.body;
       // const putBody = {

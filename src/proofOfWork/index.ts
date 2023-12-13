@@ -1,6 +1,6 @@
 import { FastifyInstance, FastifyServerOptions } from "fastify";
-import { agent, DEFAULT_IDENTIFIER_SCHEMA } from "../setup.js";
 import { argon2Verify } from "hash-wasm";
+import { agent, DEFAULT_IDENTIFIER_SCHEMA } from "../setup.js";
 
 const challenge = `(answerHex.match(/0000/g) || []).length > 0`
 
@@ -29,7 +29,7 @@ export default async function proofOfWorkRoutes(
 
     handler: async (request, reply) => {
       const clientDid = request.headers["x-client-id"];
-      const challengeHash = request.headers["x-challenge-hash"];;
+      const challengeHash = request.headers["x-challenge-hash"];
       if (!clientDid || !challengeHash) {
         return reply.status(400).send(`You are missing a required header`);
       } else if (

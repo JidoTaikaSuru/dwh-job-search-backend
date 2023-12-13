@@ -1,7 +1,7 @@
-import {JobListingPutBody} from "./index.js";
-import {supabaseClient} from "../index.js";
 import {IPresentationDefinition} from "@sphereon/pex";
+import {supabaseClient} from "../index.js";
 import {loadPlaceholdersIntoPresentationDefinition, PresentationDefinitionPlaceholder,} from "../presentation/lib.js";
+import {JobListingPutBody} from "./index.js";
 
 /* This script seeds the job_listings table in Supabase
  *  It was written so we can quickly iterate on presentation definitions and troubleshoot edge cases

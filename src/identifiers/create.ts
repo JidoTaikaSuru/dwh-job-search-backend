@@ -1,5 +1,5 @@
-import { agent, ION_IDENTIFIER_SCHEMA } from "../setup.js";
 import { FastifyReply, FastifyRequest } from "fastify";
+import { agent, ION_IDENTIFIER_SCHEMA } from "../setup.js";
 
 /*
 Create identifier creates an identity for our internal credential issuer.

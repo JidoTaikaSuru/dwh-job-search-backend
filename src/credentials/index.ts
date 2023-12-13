@@ -1,7 +1,7 @@
 import { FastifyInstance, FastifyServerOptions } from "fastify";
 import { jwtAuthentication } from "../index.js";
-import { issueHasAccountCredentialHandler } from "./issue/hasAccount.js";
 import { getUserCredentials } from "./getCredentials.js";
+import { issueHasAccountCredentialHandler } from "./issue/hasAccount.js";
 import { issueHasVerifiedEmailCredentialHandler } from "./issue/hasVerifiedEmail.js";
 import { issuePassedCaptchaCredential } from "./issue/passedCaptcha.js";
 

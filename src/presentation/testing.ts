@@ -1,5 +1,5 @@
-import { IVerifiableCredential } from "@sphereon/ssi-types";
 import { PEX } from "@sphereon/pex";
+import { IVerifiableCredential } from "@sphereon/ssi-types";
 import {
   hasAccountPresentationDefinition,
   precreateJobListings,

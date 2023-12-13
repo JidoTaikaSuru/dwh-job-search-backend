@@ -1,6 +1,6 @@
-import { Database } from "./__generated__/supabase-types.js";
 import { User as SupabaseUser } from "@supabase/supabase-js";
 import {VerifiableCredential} from "@veramo/core";
+import { Database } from "./__generated__/supabase-types.js";
 
 // adding jwt property to req
 // authenticate property to FastifyInstance

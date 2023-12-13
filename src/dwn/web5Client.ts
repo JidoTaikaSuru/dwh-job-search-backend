@@ -1,5 +1,5 @@
-import { Record, Web5 } from "@web5/api";
 import { DateSort, ProtocolDefinition } from "@tbd54566975/dwn-sdk-js";
+import { Record, Web5 } from "@web5/api";
 import { protocols } from "./protocols.js";
 
 export const configureProtocol = async (
