@@ -5,17 +5,20 @@
   "main": "index.js",
   "scripts": {
     "dev": "tsc-watch --project . --outDir ./dist --onSuccess \"nodemon ./dist/index.js\"",
+    "dev-a": "port=8081 parentpk=2163b9e4411ad1df8720833b35dcf57ce44556280d9e020de2dc11752798ff9c tsc-watch --project . --outDir ./dist --onSuccess \"nodemon ./dist/index.js\"",
+    "dev-b": "port=8082 parentpk=06b0228c23b962b930dc112ba2ece59f9ba9713569eb598d0d52876275dc2dae tsc-watch --project . --outDir ./dist --onSuccess \"nodemon ./dist/index.js\"",  
+    "dev-c": "port=8083 parentpk=42c7da8ac46b310bcc1334ca21b02294a9d8d89204ebd78f60b8e34b3056ff73 tsc-watch --project . --outDir ./dist --onSuccess \"nodemon ./dist/index.js\"",   
     "dev-dummy": "tsc-watch --project . --outDir ./dist --onSuccess \"nodemon ./dist/presentation/testing.js\"",
     "update-listings": "tsc-watch --project . --outDir ./dist --onSuccess \"nodemon ./dist/job_listing/setup.js\"",
     "update-dwn": "tsc-watch --project . --outDir ./dist --onSuccess \"nodemon ./dist/dwn/setupDwn.js\"",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev-a": "ENV_VAR=value tsc-watch --project . --outDir ./dist --onSuccess \"nodemon ./dist/job_listing/setup.js\""
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@fastify/cors": "^8.4.1",
+    "@ipld/dag-json": "^10.1.5",
     "@sphereon/pex": "workspace:*",
     "@sphereon/ssi-types": "^0.17.5",
     "@supabase/supabase-js": "^2.38.4",
@@ -39,7 +42,11 @@
     "pg": "^8.11.3",
     "sqlite3": "^5.1.6",
     "typeorm": "^0.3.17",
-    "web-did-resolver": "^2.0.27"
+    "web-did-resolver": "^2.0.27",
+    "@trust/keyto":"^1.0.1",
+    "ethers":"^6.9.0",
+    "multiformats":"^12.1.3",
+    "jose":"^5.1.3"
   },
   "type": "module",
   "devDependencies": {
