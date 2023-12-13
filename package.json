@@ -1,0 +1,52 @@
+{
+  "name": "vc-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "tsc-watch --project . --outDir ./dist --onSuccess \"nodemon ./dist/index.js\"",
+    "dev-dummy": "tsc-watch --project . --outDir ./dist --onSuccess \"nodemon ./dist/presentation/testing.js\"",
+    "update-listings": "tsc-watch --project . --outDir ./dist --onSuccess \"nodemon ./dist/job_listing/setup.js\"",
+    "update-dwn": "tsc-watch --project . --outDir ./dist --onSuccess \"nodemon ./dist/dwn/setupDwn.js\"",
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev-a": "ENV_VAR=value tsc-watch --project . --outDir ./dist --onSuccess \"nodemon ./dist/job_listing/setup.js\""
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fastify/cors": "^8.4.1",
+    "@sphereon/pex": "workspace:*",
+    "@sphereon/ssi-types": "^0.17.5",
+    "@supabase/supabase-js": "^2.38.4",
+    "@tbd54566975/dwn-sdk-js": "^0.2.8",
+    "@veramo/core": "^5.5.3",
+    "@veramo/credential-w3c": "^5.5.3",
+    "@veramo/data-store": "^5.5.3",
+    "@veramo/did-manager": "^5.5.3",
+    "@veramo/did-provider-ethr": "^5.5.3",
+    "@veramo/did-provider-ion": "^5.5.3",
+    "@veramo/did-provider-web": "^5.5.3",
+    "@veramo/did-resolver": "^5.5.3",
+    "@veramo/key-manager": "^5.5.3",
+    "@veramo/kms-local": "^5.5.3",
+    "@web5/api": "^0.8.2",
+    "did-resolver": "^4.1.0",
+    "dotenv": "^16.3.1",
+    "ethr-did-resolver": "^10.0.0",
+    "fastify": "^4.24.3",
+    "hash-wasm": "^4.11.0",
+    "pg": "^8.11.3",
+    "sqlite3": "^5.1.6",
+    "typeorm": "^0.3.17",
+    "web-did-resolver": "^2.0.27"
+  },
+  "type": "module",
+  "devDependencies": {
+    "@types/node": "^20.9.1",
+    "fastify-tsconfig": "^2.0.0",
+    "nodemon": "^3.0.1",
+    "tsc-watch": "^6.0.4",
+    "typescript": "^5.2.2"
+  }
+}
