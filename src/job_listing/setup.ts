@@ -123,15 +123,23 @@ export const hasPassedCaptchaPresentationDefinition: IPresentationDefinition = {
 //JDs here come from indeed.com
 const preCreateJobListings: JobListingPutBody[] = [
   {
-    id: "8ae3ea55-53f2-4000-ae39-8328816eb748",
-    title: "Software Engineer",
-    description:
-      "A Software Engineer, or Software Development Engineer, is responsible for developing software programs or systems that align with user needs. Their duties include meeting with clients or business professionals to strategize ideas for beneficial software, coordinating with other IT professionals to design software and running tests to catch coding errors.",
-    company: "Decentralinked",
-    presentation_definition: loadPlaceholdersIntoPresentationDefinition(
-      hasAccountPresentationDefinition,
-      [issuerIdPlaceholder],
-    ),
+    job_listing: {
+      id: "8ae3ea55-53f2-4000-ae39-8328816eb748",
+      title: "Software Engineer",
+      description:
+        "A Software Engineer, or Software Development Engineer, is responsible for developing software programs or systems that align with user needs. Their duties include meeting with clients or business professionals to strategize ideas for beneficial software, coordinating with other IT professionals to design software and running tests to catch coding errors.",
+      company: "Decentralinked",
+      "duration": "6 months",
+      "experience_level": "Senior",
+      "required_skills": ["JavaScript", "React", "Node.js", "SQL", "AWS"],
+      "project_stage": "Development",
+      "desired_salary": "$120,000 per year",
+      "level_of_involvement": "Full-time",
+      presentation_definition: loadPlaceholdersIntoPresentationDefinition(
+        hasAccountPresentationDefinition,
+        [issuerIdPlaceholder],
+      ),
+    },
   },
   // {
   //   id: "aaf168a8-1e16-41b3-8fa7-b7ee53e8aaea",
@@ -156,27 +164,43 @@ const preCreateJobListings: JobListingPutBody[] = [
   //   ),
   // },
   {
-    id: "47d78076-4c3c-45e8-a54f-c76c3cf1472e",
-    title: "Senior Software Engineer",
-    description:
-      "A Senior Software Engineer is a professional responsible for directing software development projects, producing clean code, and leading a team of engineers. They possess extensive experience in software development, project management, and have in-depth knowledge of programming languages and databases.",
-    company: "Decentralinked",
-    presentation_definition: loadPlaceholdersIntoPresentationDefinition(
-      hasVerifiedEmailPresentationDefinition,
-      [issuerIdPlaceholder],
-    ),
+    job_listing: {
+      id: "47d78076-4c3c-45e8-a54f-c76c3cf1472e",
+      title: "Senior Software Engineer",
+      description:
+        "A Senior Software Engineer is a professional responsible for directing software development projects, producing clean code, and leading a team of engineers. They possess extensive experience in software development, project management, and have in-depth knowledge of programming languages and databases.",
+      company: "Decentralinked",
+      "duration": "6 months",
+      "experience_level": "Senior",
+      "required_skills": ["JavaScript", "React", "Node.js", "SQL", "AWS"],
+      "project_stage": "Development",
+      "desired_salary": "$120,000 per year",
+      "level_of_involvement": "Full-time",
+      presentation_definition: loadPlaceholdersIntoPresentationDefinition(
+        hasVerifiedEmailPresentationDefinition,
+        [issuerIdPlaceholder],
+      ),
+    }
   },
   {
-    id: "997d8528-d7c6-4ae3-b906-e59e9529c896",
-    title: "Staff Software Engineer",
-    description:
-      'Staff software engineers combine their technical proficiencies and leadership skills to find effective software solutions. People in this role typically have extensive experience, advanced computer skills, and knowledge of software development principles. Learning more about what a staff software engineer does and how you can prepare for this career path can help you determine whether the role interests you. In this article, we answer the question, "What is a staff software engineer?", list some of their duties and responsibilities, explain how to start your career in this field and explore some skills you can develop for success.',
-    company: "Decentralinked",
-    presentation_definition: loadPlaceholdersIntoPresentationDefinition(
-      hasPassedCaptchaPresentationDefinition,
-      [issuerIdPlaceholder],
-    ),
-  },
+    job_listing: {
+      id: "997d8528-d7c6-4ae3-b906-e59e9529c896",
+      title: "Staff Software Engineer",
+      description:
+        'Staff software engineers combine their technical proficiencies and leadership skills to find effective software solutions. People in this role typically have extensive experience, advanced computer skills, and knowledge of software development principles. Learning more about what a staff software engineer does and how you can prepare for this career path can help you determine whether the role interests you. In this article, we answer the question, "What is a staff software engineer?", list some of their duties and responsibilities, explain how to start your career in this field and explore some skills you can develop for success.',
+      company: "Decentralinked",
+      "duration": "6 months",
+      "experience_level": "Senior",
+      "required_skills": ["JavaScript", "React", "Node.js", "SQL", "AWS"],
+      "project_stage": "Development",
+      "desired_salary": "$120,000 per year",
+      "level_of_involvement": "Full-time",
+      presentation_definition: loadPlaceholdersIntoPresentationDefinition(
+        hasPassedCaptchaPresentationDefinition,
+        [issuerIdPlaceholder],
+      ),
+    },
+  }
 ];
 
 // Seeding and upserting job listings wil let us iterate on presentation definitions faster
@@ -186,7 +210,7 @@ export const precreateJobListings = async () => {
     console.log("Upserting jobListing", JSON.stringify(jobListing, null, 2));
     const { data, error } = await supabaseClient
       .from("job_listings")
-      .upsert(jobListing);
+      .upsert(jobListing.job_listing);
     if (error) {
       console.error(error);
     }

@@ -7,17 +7,19 @@ import { loadUserDataPlaceholdersIntoPresentationDefinition } from '../presentat
 const uuidRegex = '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[4][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$'
 
 export type JobListingPutBody = {
-  id?: string;
-  title: string;
-  description?: string;
-  duration: string;
-  experience_level: string;
-  required_skills: string[];
-  project_stage: string;
-  desired_salary: string;
-  level_of_involvement: string;
-  company: string;
-  presentation_definition: any; //TODO use a real type here
+  job_listing: {
+    id?: string;
+    title: string;
+    description?: string;
+    duration: string;
+    experience_level: string;
+    required_skills: string[];
+    project_stage: string;
+    desired_salary: string;
+    level_of_involvement: string;
+    company: string;
+    presentation_definition: any; //TODO use a real type here
+  }
 };
 
 export default async function jobListingRoutes(
@@ -37,7 +39,7 @@ export default async function jobListingRoutes(
       body: {
         type: 'object',
         properties: {
-          'job-listing': {
+          'job_listing': {
             type: 'object',
             properties: {
               id: {
@@ -65,13 +67,13 @@ export default async function jobListingRoutes(
             },
           },
         },
-        required: ['job-listing'],
+        required: ['job_listing'],
       },
     },
     preHandler: jwtAuthentication,
     handler: async (request, reply) => {
       const { id, title, description, duration, experience_level, required_skills, project_stage, desired_salary, level_of_involvement, company, presentation_definition } =
-        request.body;
+        request.body.job_listing;
       const putBody = {
         // If id is null, do random uuidv4
         id: id || uuid(),

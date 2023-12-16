@@ -4,12 +4,14 @@ import { jwtAuthentication, supabaseClient } from '../index.js';
 
 
 export type CompanyPutBody = {
-  id?: string;
-  name: string;
-  description?: string;
-  location: string;
-  industry: string;
-  num_employees: number; //TODO use a real type here
+  company: {
+    id?: string;
+    name: string;
+    description?: string;
+    location: string;
+    industry: string;
+    num_employees: string;
+  }
 };
 
 export default async function companyRoutes(
@@ -17,7 +19,7 @@ export default async function companyRoutes(
   options: FastifyServerOptions,
 ) {
   // We use a get function here instead of reading from Supabase so we can load in placeholders
-  server.put<{ Body: CompanyPutBody }>('/job-listing', {
+  server.put<{ Body: CompanyPutBody }>('/company', {
     schema: {
       headers: {
         type: 'object',
@@ -39,7 +41,8 @@ export default async function companyRoutes(
               description: { type: 'string' },
               location: { type: 'string' },
               industry: { type: 'string' },
-              num_employees: { type: 'number' },
+              num_employees: { type: 'string',
+              enum: ['1-10', '11-50', '51-200', '201-500', '501-1000', '1001-5000', '5001-10,000', '10,001+'] },
             },
           },
         },
@@ -49,7 +52,7 @@ export default async function companyRoutes(
     preHandler: jwtAuthentication,
     handler: async (request, reply) => {
       const { id, name, description, location, industry, num_employees } =
-        request.body;
+        request.body.company;
       const putBody = {
         // If id is null, do random uuidv4
         id: id || uuid(),
@@ -61,9 +64,7 @@ export default async function companyRoutes(
         updated_at: new Date().toLocaleString(),
       };
       console.log('putBody', putBody);
-      const { data, error } = await supabaseClient.from('companies').upsert({
-        ...putBody,
-      });
+      const { data, error } = await supabaseClient.from('companies').upsert(putBody);
       if (error) {
         return reply.status(500).send(error);
       }
@@ -71,7 +72,7 @@ export default async function companyRoutes(
     },
   });
 
-  server.get<{ Params: { companyId: string } }>('/job-listing/:listingId', {
+  server.get<{ Params: { companyId: string } }>('/company/:companyId', {
     schema: {
       headers: {
         type: 'object',

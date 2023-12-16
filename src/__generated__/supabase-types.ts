@@ -716,7 +716,7 @@ export interface Database {
           industry: string | null
           location: string
           name: string
-          numEmployees: number | null
+          num_employees: string | null
           updated_at: string | null
         }
         Insert: {
@@ -726,7 +726,7 @@ export interface Database {
           industry?: string | null
           location: string
           name: string
-          numEmployees?: number | null
+          num_employees?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -736,7 +736,7 @@ export interface Database {
           industry?: string | null
           location?: string
           name?: string
-          numEmployees?: number | null
+          num_employees?: string | null
           updated_at?: string | null
         }
         Relationships: []
