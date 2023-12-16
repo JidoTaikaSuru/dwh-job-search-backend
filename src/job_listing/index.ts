@@ -9,7 +9,6 @@ const uuidRegex = '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[4][0-9a-fA-F]{3}-[89abAB][0-9
 export type JobListingPutBody = {
   id?: string;
   title: string;
-  description?: string;
   duration: string;
   experience_level: string;
   required_skills: string[];
@@ -44,10 +43,9 @@ export default async function jobListingRoutes(
                 type: 'string'
               },
               title: { type: 'string' },
-              description: { type: 'string' },
               duration: {
                 type: 'string',
-                enum: ['1 week', '2 weeks', '3 weeks', '4 weeks', '1 month', '2 months', '3 months', '4 months', '6 months', 'Longer than 6 months']
+                enum: ['4 weeks', '1 month', '2 months', '3 months', '4 months', '6 months', 'Longer than 6 months']
               },
               experience_level: { type: "string"},
               required_skills: {
@@ -70,13 +68,13 @@ export default async function jobListingRoutes(
     },
     preHandler: jwtAuthentication,
     handler: async (request, reply) => {
-      const { id, title, description, duration, experience_level, required_skills, project_stage, desired_salary, level_of_involvement, company, presentation_definition } =
+      const { id, title, duration, experience_level, required_skills, project_stage, desired_salary, level_of_involvement, company, presentation_definition } =
         request.body;
       const putBody = {
         // If id is null, do random uuidv4
         id: id || uuid(),
         title,
-        description: description || '',
+        description: '',
         duration,
         experience_level,
         required_skills,
