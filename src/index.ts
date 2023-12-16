@@ -10,8 +10,9 @@ import identifierRoutes from './identifiers/index.js';
 import jobListingRoutes from './job_listing/index.js';
 import presentationRoutes from './presentation/index.js';
 import proofOfWorkRoutes from './proofOfWork/index.js';
+import companyRoutes from './company/index.js';
 
-const server = fastify();
+export const server = fastify();
 export const supabaseClient = createClient<Database>(
   'https://api.gotid.org',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVicG5ibnpwZm10YmJyZ2lnempxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcwMDA2NDM4MiwiZXhwIjoyMDE1NjQwMzgyfQ.27a4SYNhArfx-DfEypBOaz61Ywqdul1tAFQH5UFKsrg',
@@ -58,6 +59,7 @@ await server.register(cors, {
 });
 server.register(credentialRoutes);
 server.register(presentationRoutes);
+server.register(companyRoutes);
 server.register(jobListingRoutes);
 server.register(identifierRoutes); // You can ignore these routes, see identifiers/* for details
 server.register(proofOfWorkRoutes);
@@ -65,24 +67,3 @@ server.register(dataForwarding);
 server.register(forwarding);
 server.register(requesttask);
 
-server.listen(
-  {
-    port: process.env['port'] ? parseInt(process.env['port']) : 8080,
-    host: '0.0.0.0',
-  },
-  (err, address) => {
-    if (err) {
-      console.error(err);
-      process.exit(1);
-    }
-    console.log(`Server listening at ${address}`);
-  },
-);
-
-const listeners = ['SIGINT', 'SIGTERM'];
-listeners.forEach((signal) => {
-  process.on(signal, async () => {
-    await server.close();
-    process.exit(0);
-  });
-});

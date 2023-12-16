@@ -4,10 +4,18 @@ import { FastifyInstance, FastifyServerOptions } from 'fastify';
 import { jwtAuthentication, supabaseClient } from '../index.js';
 import { loadUserDataPlaceholdersIntoPresentationDefinition } from '../presentation/lib.js';
 
+const uuidRegex = '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[4][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$'
+
 export type JobListingPutBody = {
   id?: string;
   title: string;
   description?: string;
+  duration: string;
+  experience_level: string;
+  required_skills: string[];
+  project_stage: string;
+  desired_salary: string;
+  level_of_involvement: string;
   company: string;
   presentation_definition: any; //TODO use a real type here
 };
@@ -32,10 +40,27 @@ export default async function jobListingRoutes(
           'job-listing': {
             type: 'object',
             properties: {
-              id: { type: 'string' },
+              id: {
+                type: 'string'
+              },
               title: { type: 'string' },
               description: { type: 'string' },
-              company: { type: 'string' },
+              duration: {
+                type: 'string',
+                enum: ['1 week', '2 weeks', '3 weeks', '4 weeks', '1 month', '2 months', '3 months', '4 months', '6 months', 'Longer than 6 months']
+              },
+              experience_level: { type: "string"},
+              required_skills: {
+                type: 'array',
+                items: { type: 'string' }
+              },
+              project_stage: {type: 'string'},
+              desired_salary: { type: "string"},
+              level_of_involvement: { type: "string"},
+              company: {
+                type: 'string',
+                // pattern: uuidRegex
+              },
               presentation_definition: { type: 'object' },
             },
           },
@@ -45,13 +70,19 @@ export default async function jobListingRoutes(
     },
     preHandler: jwtAuthentication,
     handler: async (request, reply) => {
-      const { id, title, description, company, presentation_definition } =
+      const { id, title, description, duration, experience_level, required_skills, project_stage, desired_salary, level_of_involvement, company, presentation_definition } =
         request.body;
       const putBody = {
         // If id is null, do random uuidv4
         id: id || uuid(),
         title,
         description: description || '',
+        duration,
+        experience_level,
+        required_skills,
+        project_stage,
+        desired_salary,
+        level_of_involvement,
         company,
         presentation_definition,
         updated_at: new Date().toLocaleString(),
