@@ -128,7 +128,7 @@ const preCreateJobListings: JobListingPutBody[] = [
       title: "Software Engineer",
       description:
         "A Software Engineer, or Software Development Engineer, is responsible for developing software programs or systems that align with user needs. Their duties include meeting with clients or business professionals to strategize ideas for beneficial software, coordinating with other IT professionals to design software and running tests to catch coding errors.",
-      company: "Decentralinked",
+      company: "ed542d7a-0643-488a-bdc8-d127863760c8",
       "duration": "6 months",
       "experience_level": "Senior",
       "required_skills": ["JavaScript", "React", "Node.js", "SQL", "AWS"],
@@ -169,7 +169,7 @@ const preCreateJobListings: JobListingPutBody[] = [
       title: "Senior Software Engineer",
       description:
         "A Senior Software Engineer is a professional responsible for directing software development projects, producing clean code, and leading a team of engineers. They possess extensive experience in software development, project management, and have in-depth knowledge of programming languages and databases.",
-      company: "Decentralinked",
+      company: "ed542d7a-0643-488a-bdc8-d127863760c8",
       "duration": "6 months",
       "experience_level": "Senior",
       "required_skills": ["JavaScript", "React", "Node.js", "SQL", "AWS"],
@@ -188,7 +188,7 @@ const preCreateJobListings: JobListingPutBody[] = [
       title: "Staff Software Engineer",
       description:
         'Staff software engineers combine their technical proficiencies and leadership skills to find effective software solutions. People in this role typically have extensive experience, advanced computer skills, and knowledge of software development principles. Learning more about what a staff software engineer does and how you can prepare for this career path can help you determine whether the role interests you. In this article, we answer the question, "What is a staff software engineer?", list some of their duties and responsibilities, explain how to start your career in this field and explore some skills you can develop for success.',
-      company: "Decentralinked",
+      company: "ed542d7a-0643-488a-bdc8-d127863760c8",
       "duration": "6 months",
       "experience_level": "Senior",
       "required_skills": ["JavaScript", "React", "Node.js", "SQL", "AWS"],

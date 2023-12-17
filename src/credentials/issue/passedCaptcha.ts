@@ -1,6 +1,6 @@
-import { FastifyReply, FastifyRequest } from "fastify";
-import { agent, DEFAULT_IDENTIFIER_SCHEMA } from "../../setup.js";
-import { storeCredential, stripDidPrefix } from "../lib.js";
+import { FastifyReply, FastifyRequest } from 'fastify';
+import { agent, DEFAULT_IDENTIFIER_SCHEMA } from '../../setup.js';
+import { storeCredential, stripDidPrefix } from '../lib.js';
 
 export const issuePassedCaptchaCredential = async (
   request: FastifyRequest,
@@ -11,7 +11,7 @@ export const issuePassedCaptchaCredential = async (
     alias: DEFAULT_IDENTIFIER_SCHEMA,
   });
   // User has already authenticated w/ JWT by the time they reach this. This means they have an account w/ us
-  // User is data from the "users" table (see __generated__/supabase-types.ts, search for users: {, see the "Row" type)
+  // User is data from the "users" table (see __generated__/rest-types.ts, search for users: {, see the "Row" type)
   // authData is data from Supabase auth, drill into it to see the type
   const { user, authData } = request;
 

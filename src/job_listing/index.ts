@@ -27,7 +27,7 @@ export default async function jobListingRoutes(
   options: FastifyServerOptions,
 ) {
   // We use a get function here instead of reading from Supabase so we can load in placeholders
-  server.put<{ Body: JobListingPutBody }>('/job-listing', {
+  server.put<{ Body: JobListingPutBody }>('/job-listings', {
     schema: {
       headers: {
         type: 'object',
@@ -100,7 +100,7 @@ export default async function jobListingRoutes(
     },
   });
 
-  server.get<{ Params: { listingId: string } }>('/job-listing/:listingId', {
+  server.get<{ Params: { listingId: string } }>('/job-listings/:listingId', {
     schema: {
       headers: {
         type: 'object',
@@ -146,6 +146,55 @@ export default async function jobListingRoutes(
         ...jobListingData,
         presentation_definition: presentationDefinition,
       });
+    },
+  });
+  server.get<{ Querystring: { includePresentationDefinitions?: boolean } }>('/job-listings', {
+    schema: {
+      headers: {
+        type: 'object',
+        properties: {
+          'x-access-token': { type: 'string' },
+        },
+        required: ['x-access-token'],
+      },
+    },
+    preHandler: jwtAuthentication,
+    handler: async (request, reply) => {
+      console.log('fetching job listings');
+      const { data: jobListingData, error: jobListingError } =
+        await supabaseClient
+          .from('job_listings')
+          .select('*');
+      if (jobListingError) {
+        return reply.status(500).send(jobListingError);
+      }
+      if (!jobListingData) {
+        return reply.status(404).send('No job listings found');
+      }
+
+      // Process each listing for presentation definitions as per the includePresentationDefinitions flag
+      if (request.query.includePresentationDefinitions) {
+        jobListingData.map(jobListing => {
+          console.log('jobListingData', jobListing);
+          const presentationDefinition =
+            loadUserDataPlaceholdersIntoPresentationDefinition(
+              // @ts-expect-error We know it's an IPresentationDefinition because that's how its stored. Supabase is unaware of typeorm
+              jobListing.presentation_definition as IPresentationDefinition,
+              request.user,
+            );
+          console.log(
+            'presentationDefinition',
+            JSON.stringify(presentationDefinition, null, 2),
+          );
+
+          return {
+            ...jobListing,
+            presentation_definition: presentationDefinition,
+          };
+        });
+      }
+
+      reply.send(jobListingData);
     },
   });
 }

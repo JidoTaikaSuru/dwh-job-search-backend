@@ -1,7 +1,7 @@
-import { FastifyReply, FastifyRequest } from "fastify";
-import { agent, DEFAULT_IDENTIFIER_SCHEMA } from "../../setup.js";
+import { FastifyReply, FastifyRequest } from 'fastify';
+import { agent, DEFAULT_IDENTIFIER_SCHEMA } from '../../setup.js';
 
-import { isDateInPastWeek, storeCredential, stripDidPrefix } from "../lib.js";
+import { isDateInPastWeek, storeCredential, stripDidPrefix } from '../lib.js';
 
 export const issueHasVerifiedEmailCredentialHandler = async (
   request: FastifyRequest,
@@ -49,7 +49,7 @@ export const issueHasVerifiedEmailCredentialHandler = async (
       type: ["VerifiableCredential", "HasVerifiedEmail"],
       credentialSubject: {
         id: user.did,
-        pubkey: `did:eth:${user.public_key}`, // This should be did:ethr:<the public key of the embedded wallet, or the id of the user from supabase>
+        pubkey: `did:eth:${user.public_key}`, // This should be did:ethr:<the public key of the embedded wallet, or the id of the user from rest>
         supabaseId: user.id,
         verifiedEmail: true,
         emailAliased: emailAliased,

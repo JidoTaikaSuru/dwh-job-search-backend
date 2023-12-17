@@ -19,7 +19,7 @@ export default async function companyRoutes(
   options: FastifyServerOptions,
 ) {
   // We use a get function here instead of reading from Supabase so we can load in placeholders
-  server.put<{ Body: CompanyPutBody }>('/company', {
+  server.put<{ Body: CompanyPutBody }>('/companies', {
     schema: {
       headers: {
         type: 'object',
@@ -72,7 +72,7 @@ export default async function companyRoutes(
     },
   });
 
-  server.get<{ Params: { companyId: string } }>('/company/:companyId', {
+  server.get<{ Params: { companyId: string } }>('/companies/:companyId', {
     schema: {
       headers: {
         type: 'object',
@@ -102,6 +102,32 @@ export default async function companyRoutes(
       }
 
       reply.send(companyData);
+    },
+  });
+  server.get('/companies', {
+    schema: {
+      headers: {
+        type: 'object',
+        properties: {
+          'x-access-token': { type: 'string' },
+        },
+        required: ['x-access-token'],
+      },
+    },
+    preHandler: jwtAuthentication,
+    handler: async (request, reply) => {
+      console.log('fetching all companies');
+      const { data: companiesData, error: companiesError } =
+        await supabaseClient
+          .from('companies')
+          .select('*');
+      if (companiesError) {
+        return reply.status(500).send(companiesError);
+      }
+      if (!companiesData || companiesData.length === 0) {
+        return reply.status(404).send('No companies found');
+      }
+      reply.send(companiesData);
     },
   });
 }

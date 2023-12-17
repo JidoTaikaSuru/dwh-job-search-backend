@@ -31,7 +31,7 @@
 //             expirationDate: date.toLocaleString(),
 //             type: ["VerifiableCredential", "HasAccountWithTrustAuthority"],
 //             credentialSubject: {
-//                 id: `did:eth:${user.public_key}`, // This should be did:ethr:<the public key of the embedded wallet, or the id of the user from supabase>
+//                 id: `did:eth:${user.public_key}`, // This should be did:ethr:<the public key of the embedded wallet, or the id of the user from rest>
 //                 signinMethod: "OTP",
 //             },
 //         },
