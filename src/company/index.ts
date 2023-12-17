@@ -1,33 +1,69 @@
-import { uuid } from '@supabase/supabase-js/dist/main/lib/helpers.js';
 import { FastifyInstance, FastifyServerOptions } from 'fastify';
-import { jwtAuthentication, supabaseClient } from '../index.js';
+import { Database } from '../__generated__/supabase-types.js';
+import {
+  genericCreate,
+  genericFetchAll,
+  genericFetchById,
+  genericUpdate,
+  JWT_HEADER,
+  JWT_HEADER_SCHEMA_AND_PREHANDLER,
+  jwtAuthentication,
+} from '../index.js';
 
 
-export type CompanyPutBody = {
-  company: {
-    id?: string;
-    name: string;
-    description?: string;
-    location: string;
-    industry: string;
-    num_employees: string;
-  }
-};
+export type CompanyPostBody = Database['public']['Tables']['companies']['Insert'];
+export type CompanyPutBody = Database['public']['Tables']['companies']['Update'];
+
 
 export default async function companyRoutes(
   server: FastifyInstance,
   options: FastifyServerOptions,
 ) {
-  // We use a get function here instead of reading from Supabase so we can load in placeholders
-  server.put<{ Body: CompanyPutBody }>('/companies', {
+  server.get('/companies', {
+    ...JWT_HEADER_SCHEMA_AND_PREHANDLER,
+    handler: async (request, reply) => {
+      return await genericFetchAll('companies', reply);
+    },
+  });
+
+  server.get<{ Params: { companyId: string } }>('/companies/:companyId', {
+    ...JWT_HEADER_SCHEMA_AND_PREHANDLER,
+    handler: async (request, reply) => {
+      return await genericFetchById('companies', request.params.companyId, reply);
+    },
+  });
+  server.post<{ Body: CompanyPostBody }>('/companies', {
     schema: {
-      headers: {
+      headers: JWT_HEADER,
+      body: {
         type: 'object',
         properties: {
-          'x-access-token': { type: 'string' },
+          'company': {
+            type: 'object',
+            properties: {
+              name: { type: 'string' },
+              description: { type: 'string' },
+              location: { type: 'string' },
+              industry: { type: 'string' },
+              num_employees: {
+                type: 'string',
+                enum: ['1-10', '11-50', '51-200', '201-500', '501-1000', '1001-5000', '5001-10,000', '10,001+'],
+              },
+            },
+          },
         },
-        required: ['x-access-token'],
+        required: ['company'],
       },
+    },
+    preHandler: jwtAuthentication,
+    handler: async (request, reply) => {
+      return genericCreate<CompanyPostBody>('companies', request.body, reply);
+    },
+  });
+
+  server.put<{ Body: CompanyPutBody }>('/companies/:companyId', {
+    schema: {
+      headers: JWT_HEADER,
       body: {
         type: 'object',
         properties: {
@@ -41,8 +77,10 @@ export default async function companyRoutes(
               description: { type: 'string' },
               location: { type: 'string' },
               industry: { type: 'string' },
-              num_employees: { type: 'string',
-              enum: ['1-10', '11-50', '51-200', '201-500', '501-1000', '1001-5000', '5001-10,000', '10,001+'] },
+              num_employees: {
+                type: 'string',
+                enum: ['1-10', '11-50', '51-200', '201-500', '501-1000', '1001-5000', '5001-10,000', '10,001+'],
+              },
             },
           },
         },
@@ -51,83 +89,7 @@ export default async function companyRoutes(
     },
     preHandler: jwtAuthentication,
     handler: async (request, reply) => {
-      const { id, name, description, location, industry, num_employees } =
-        request.body.company;
-      const putBody = {
-        // If id is null, do random uuidv4
-        id: id || uuid(),
-        name,
-        description: description || '',
-        location,
-        industry,
-        num_employees,
-        updated_at: new Date().toLocaleString(),
-      };
-      console.log('putBody', putBody);
-      const { data, error } = await supabaseClient.from('companies').upsert(putBody);
-      if (error) {
-        return reply.status(500).send(error);
-      }
-      return reply.send(data);
-    },
-  });
-
-  server.get<{ Params: { companyId: string } }>('/companies/:companyId', {
-    schema: {
-      headers: {
-        type: 'object',
-        properties: {
-          'x-access-token': { type: 'string' },
-        },
-        required: ['x-access-token'],
-      },
-    },
-    preHandler: jwtAuthentication,
-    handler: async (request, reply) => {
-      const { companyId } = request.params;
-
-      console.log('fetching job listing', companyId);
-      const { data: companyData, error: companyError } =
-        await supabaseClient
-          .from('companies')
-          .select('*')
-          .eq('id', companyId)
-          .single();
-
-      if (companyError) {
-        return reply.status(500).send(companyError);
-      }
-      if (!companyData) {
-        return reply.status(404).send('Job listing not found');
-      }
-
-      reply.send(companyData);
-    },
-  });
-  server.get('/companies', {
-    schema: {
-      headers: {
-        type: 'object',
-        properties: {
-          'x-access-token': { type: 'string' },
-        },
-        required: ['x-access-token'],
-      },
-    },
-    preHandler: jwtAuthentication,
-    handler: async (request, reply) => {
-      console.log('fetching all companies');
-      const { data: companiesData, error: companiesError } =
-        await supabaseClient
-          .from('companies')
-          .select('*');
-      if (companiesError) {
-        return reply.status(500).send(companiesError);
-      }
-      if (!companiesData || companiesData.length === 0) {
-        return reply.status(404).send('No companies found');
-      }
-      reply.send(companiesData);
+      return genericUpdate<CompanyPutBody>('companies', request.body, reply);
     },
   });
 }

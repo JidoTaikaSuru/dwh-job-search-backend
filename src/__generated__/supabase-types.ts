@@ -938,6 +938,45 @@ export interface Database {
           }
         ]
       }
+      job_replies: {
+        Row: {
+          created_at: string
+          id: string
+          job_listing_id: string
+          resume: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          job_listing_id: string
+          resume: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          job_listing_id?: string
+          resume?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "job_replies_job_listing_id_fkey"
+            columns: ["job_listing_id"]
+            isOneToOne: false
+            referencedRelation: "job_listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "job_replies_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
       key: {
         Row: {
           identifierDid: string | null
