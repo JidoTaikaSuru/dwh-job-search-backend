@@ -1,7 +1,7 @@
-import { FastifyReply, FastifyRequest } from "fastify";
-import { agent, DEFAULT_IDENTIFIER_SCHEMA } from "../../setup.js";
+import { FastifyReply, FastifyRequest } from 'fastify';
+import { agent, DEFAULT_IDENTIFIER_SCHEMA } from '../../setup.js';
 
-import { storeCredential, stripDidPrefix } from "../lib.js";
+import { storeCredential, stripDidPrefix } from '../lib.js';
 
 export const issueHasAccountCredentialHandler = async (
   request: FastifyRequest,
@@ -38,7 +38,7 @@ export const issueHasAccountCredentialHandler = async (
       type: ["VerifiableCredential", "HasAccountWithTrustAuthority"],
       credentialSubject: {
         id: user.did,
-        pubkey: `did:eth:${user.public_key}`, // This should be did:ethr:<the public key of the embedded wallet, or the id of the user from supabase>
+        pubkey: `did:eth:${user.public_key}`, // This should be did:ethr:<the public key of the embedded wallet, or the id of the user from rest>
         supabaseId: user.id,
       },
     },
