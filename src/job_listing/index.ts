@@ -2,14 +2,13 @@ import { IPresentationDefinition } from '@sphereon/pex';
 import { FastifyInstance, FastifyServerOptions } from 'fastify';
 import { Database, Json } from '../__generated__/supabase-types.js';
 import {
-  genericCreate,
-  genericUpdate,
   JWT_HEADER,
   JWT_HEADER_SCHEMA_AND_PREHANDLER,
   jwtAuthentication,
   supabaseClient,
 } from '../index.js';
 import { loadUserDataPlaceholdersIntoPresentationDefinition } from '../presentation/lib.js';
+import { genericCreate, genericUpdate } from '../lib.js';
 
 const uuidRegex = '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[4][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$';
 

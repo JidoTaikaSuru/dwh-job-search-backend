@@ -25,6 +25,7 @@
   //  "isolatedModules": false
  },
  "include": [
-  "src/**/*.ts"
+  "src/**/*.ts",
+  "api/**/*.ts"
  ]
 }

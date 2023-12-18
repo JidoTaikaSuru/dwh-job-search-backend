@@ -3,15 +3,12 @@
 import { FastifyInstance, FastifyServerOptions } from 'fastify';
 import { Database } from '../__generated__/supabase-types.js';
 import {
-  genericCreate,
-  genericFetchAll,
-  genericFetchById,
-  genericUpdate,
   JWT_HEADER,
   JWT_HEADER_SCHEMA_AND_PREHANDLER,
   jwtAuthentication,
   supabaseClient,
 } from '../index.js';
+import { genericCreate, genericFetchAll, genericFetchById, genericUpdate } from '../lib.js';
 
 export type UserPostBody = Omit<Database['public']['Tables']['users']['Insert'], 'id' | 'created_at'>;
 export type UserPutBody = Database['public']['Tables']['users']['Update'];

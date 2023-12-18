@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@fastify/aws-lambda':
+    specifier: ^3.5.0
+    version: 3.5.0
   '@fastify/cors':
     specifier: ^8.4.1
     version: 8.5.0
@@ -27,6 +30,9 @@ dependencies:
     specifier: ^1.0.1
     version: 1.0.1
   '@veramo/core':
+    specifier: ^5.5.3
+    version: 5.5.3
+  '@veramo/core-types':
     specifier: ^5.5.3
     version: 5.5.3
   '@veramo/credential-w3c':
@@ -103,6 +109,9 @@ devDependencies:
   '@types/node':
     specifier: ^20.10.4
     version: 20.10.5
+  '@types/trust__keyto':
+    specifier: ^1.0.4
+    version: 1.0.4
   '@typescript-eslint/eslint-plugin':
     specifier: ^6.14.0
     version: 6.14.0(@typescript-eslint/parser@6.14.0)(eslint@8.56.0)(typescript@5.3.3)
@@ -2655,6 +2664,10 @@ packages:
       fast-uri: 2.3.0
     dev: false
 
+  /@fastify/aws-lambda@3.5.0:
+    resolution: {integrity: sha512-AWn6/uVJX+oi/kTkh72kfkrZ7bu8REshaaP2Sqbjya25olN5nvw0ht1K3jL8DPRlOGym3XAZ/GN0C9r23Mo5mw==}
+    dev: false
+
   /@fastify/busboy@2.1.0:
     resolution: {integrity: sha512-+KpH+QxZU7O4675t3mnkQKcZZg56u+K/Ct2K+N2AZYNVK8kyeo/bI18tI8aPm3tvNNRyTWfj6s5tnGNlcbQRsA==}
     engines: {node: '>=14'}
@@ -3975,6 +3988,12 @@ packages:
   /@types/stack-utils@2.0.3:
     resolution: {integrity: sha512-9aEbYZ3TbYMznPdcdr3SmIrLXwC/AKZXQeCf9Pgao5CKb8CyHuEX5jzWPTkvregvhRJHcpRO6BFoGW9ycaOkYw==}
     dev: false
+
+  /@types/trust__keyto@1.0.4:
+    resolution: {integrity: sha512-qUfZR9LG8txSmbYCGBWiy27yhr1aj7l8JVe8ocdSPnTmeVzslYNBHwRLUu5ITyvqAaQARgB7rA3gDOgph3vQTw==}
+    dependencies:
+      '@types/node': 20.10.5
+    dev: true
 
   /@types/websocket@1.0.10:
     resolution: {integrity: sha512-svjGZvPB7EzuYS94cI7a+qhwgGU1y89wUgjT6E2wVUfmAGIvRfT7obBvRtnhXCSsoMdlG4gBFGE7MfkIXZLoww==}
@@ -6259,6 +6278,7 @@ packages:
 
   /emoji-regex@8.0.0:
     resolution: {integrity: sha512-MSjYzcWNOA0ewAHpz0MxpYFvwg6yjy1NG3xteoqz644VCo/RPgnr1/GGt+ic3iJTzQ8Eu3TdM14SawnVUmGE6A==}
+    requiresBuild: true
     dev: false
 
   /encodeurl@1.0.2:
@@ -8030,6 +8050,7 @@ packages:
   /is-fullwidth-code-point@3.0.0:
     resolution: {integrity: sha512-zymm5+u+sCsSWyD9qNaejV3DFvhCKclKdizYaJUuHA83RLjb7nSuGnddCHGv0hk+KY7BMAlsWeK4Ueg6EV6XQg==}
     engines: {node: '>=8'}
+    requiresBuild: true
     dev: false
 
   /is-glob@2.0.1:
