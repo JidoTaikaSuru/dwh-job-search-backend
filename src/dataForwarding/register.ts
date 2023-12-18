@@ -2,6 +2,8 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import { argon2Verify } from "hash-wasm";
 import { supabaseClient } from "../index.js";
 import { DEFAULT_IDENTIFIER_SCHEMA, agent } from "../setup.js";
+import child_process from 'child_process';
+import util from 'util';
 
 export const registerDataSubscriptionEndpoint = async (
     request: FastifyRequest,
@@ -39,6 +41,17 @@ export const registerDataSubscriptionEndpoint = async (
 
     const pingLatency = 300;
 
+    /*
+    const exec = util.promisify(child_process.exec);
+    const { stdout, stderr } = await exec(`ping -c 1 ${endpoint}`);
+
+    var lat = stdout.match(/("time=")\d(" ms")+/g)?.[0];
+    console.log("🚀 ~ file: register.ts:44 ~ lat:", lat)
+    
+    var pingLatency = +stdout.substring(stdout.indexOf("time="), stdout.indexOf(" ms"));
+    console.log("🚀 ~ file: register.ts:44 ~ pingLatency:", pingLatency)
+*/
+
     if (pingLatency > 1000) {
         return reply.status(400)
             .send(`Latency check failed! Expected latency <= 1s (1000 ms). Current latency is ${pingLatency}`);
@@ -50,9 +63,9 @@ export const registerDataSubscriptionEndpoint = async (
         last_latency: pingLatency,
     };
 
-    const {error} = await supabaseClient.from("data_subscribers").upsert(send_data);
+    const { error } = await supabaseClient.from("data_subscribers").upsert(send_data);
 
-    if(error){
+    if (error) {
         return reply.status(400).send(error);
     }
 
