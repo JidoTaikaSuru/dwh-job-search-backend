@@ -24,7 +24,7 @@
   "dependencies": {
     "@fastify/cors": "^8.4.1",
     "@ipld/dag-json": "^10.1.5",
-    "@sphereon/pex": "workspace:*",
+    "@sphereon/pex": "^2.2.2",
     "@sphereon/ssi-types": "^0.17.5",
     "@supabase/supabase-js": "^2.38.4",
     "@tbd54566975/dwn-sdk-js": "^0.2.8",
