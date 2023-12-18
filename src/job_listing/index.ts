@@ -1,6 +1,6 @@
 import { IPresentationDefinition } from '@sphereon/pex';
 import { FastifyInstance, FastifyServerOptions } from 'fastify';
-import { Database } from '../__generated__/supabase-types.js';
+import { Database, Json } from '../__generated__/supabase-types.js';
 import {
   genericCreate,
   genericUpdate,
@@ -13,8 +13,19 @@ import { loadUserDataPlaceholdersIntoPresentationDefinition } from '../presentat
 
 const uuidRegex = '^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[4][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}$';
 
-type JobListingPostBody = Database['public']['Tables']['job_listings']['Insert'];
-type JobListingPutBody = Database['public']['Tables']['job_listings']['Update']
+export type JobListingPostBody = Database['public']['Tables']['job_listings']['Insert'];
+export type JobListingPutBody = Database['public']['Tables']['job_listings']['Update']
+export type JobListingSearch = {
+  company?: string
+  desired_salary?: string | null
+  duration?: string | null
+  experience_level?: string | null
+  level_of_involvement?: string | null
+  presentation_definition?: Json | null
+  project_stage?: string | null
+  required_skills?: string[] | null
+  text: string | null
+}
 
 export default async function jobListingRoutes(
   server: FastifyInstance,
@@ -64,91 +75,73 @@ export default async function jobListingRoutes(
     schema: {
       headers: JWT_HEADER,
       body: {
-        type: 'object',
-        properties: {
-          'job_listing': {
-            type: 'object',
-            properties: {
-              title: { type: 'string' },
-              description: { type: 'string' },
-              duration: {
-                type: 'string',
-                enum: ['1 week', '2 weeks', '3 weeks', '4 weeks', '1 month', '2 months', '3 months', '4 months', '6 months', 'Longer than 6 months']
-              },
-              experience_level: { type: "string" },
-              required_skills: {
-                type: 'array',
-                items: { type: 'string' }
-              },
-              project_stage: {type: 'string'},
-              desired_salary: { type: "string"},
-              level_of_involvement: { type: "string"},
-              company: {
-                type: 'string',
-                // pattern: uuidRegex
-              },
-              presentation_definition: { type: 'object' },
-            },
-            required: ['title', 'duration', 'experience_level', 'required_skills', 'project_stage', 'desired_salary', 'level_of_involvement', 'company']
-          },
+        title: { type: 'string' },
+        description: { type: 'string' },
+        duration: {
+          type: 'string',
+          enum: ['1 week', '2 weeks', '3 weeks', '4 weeks', '1 month', '2 months', '3 months', '4 months', '6 months', 'Longer than 6 months'],
         },
-        required: ['job_listing'],
+        experience_level: { type: 'string' },
+        required_skills: {
+          type: 'array',
+          items: { type: 'string' },
+        },
+        project_stage: { type: 'string' },
+        desired_salary: { type: 'string' },
+        level_of_involvement: { type: 'string' },
+        company: {
+          type: 'string',
+          // pattern: uuidRegex
+        },
+        presentation_definition: { type: 'object' },
       },
     },
     preHandler: jwtAuthentication,
     handler: async (request, reply) => {
-      if(!request.body.company) {
-        return reply.status(400).send("You must specify a company")
-      }
-      return genericCreate<JobListingPostBody>("job_listings", request.body, reply);
+      return genericCreate<JobListingPostBody>('job_listings', request.body, reply);
     },
   });
 
-  server.post<{ Body: JobListingPutBody }>('/job-listings/search', {
+  server.post<{ Body: JobListingSearch }>('/job-listings/search', {
     schema: {
       headers: JWT_HEADER,
       body: {
-        type: 'object',
-        properties: {
-          'job_listing': {
-            type: 'object',
-            properties: {
-              title: { type: 'string' },
-              description: { type: 'string' },
-              duration: {
-                type: 'string',
-                enum: ['1 week', '2 weeks', '3 weeks', '4 weeks', '1 month', '2 months', '3 months', '4 months', '6 months', 'Longer than 6 months']
-              },
-              experience_level: { type: "string" },
-              required_skills: {
-                type: 'array',
-                items: { type: 'string' }
-              },
-              project_stage: {type: 'string'},
-              desired_salary: { type: "string"},
-              level_of_involvement: { type: "string"},
-              company: {
-                type: 'string',
-                // pattern: uuidRegex
-              },
-              presentation_definition: { type: 'object' },
-            },
-            required: ['title', 'duration', 'experience_level', 'required_skills', 'project_stage', 'desired_salary', 'level_of_involvement', 'company']
-          },
+        title: { type: 'string' },
+        description: { type: 'string' },
+        duration: {
+          type: 'string',
+          enum: ['1 week', '2 weeks', '3 weeks', '4 weeks', '1 month', '2 months', '3 months', '4 months', '6 months', 'Longer than 6 months'],
         },
-        required: ['job_listing'],
+        experience_level: { type: 'string' },
+        required_skills: {
+          type: 'array',
+          items: { type: 'string' },
+        },
+        project_stage: { type: 'string' },
+        desired_salary: { type: 'string' },
+        level_of_involvement: { type: 'string' },
+        company: {
+          type: 'string',
+          // pattern: uuidRegex
+        },
+        presentation_definition: { type: 'object' },
       },
     },
     preHandler: jwtAuthentication,
     handler: async (request, reply) => {
-      const {title, description, duration, experience_level, required_skills, project_stage, desired_salary, level_of_involvement, company} = request.body;
+      const {
+        text,
+        duration,
+        experience_level,
+        // required_skills,
+        project_stage,
+        desired_salary,
+        level_of_involvement,
+        company,
+      } = request.body;
       const baseQuery = supabaseClient.from('job_listings').select('*');
-      const textSearch = []
-      if (title) {
-        textSearch.push(`title.ilike.*${title}*`)
-      }
-      if (description) {
-        textSearch.push(`title.ilike.*${title}*`)
+      if (text) {
+        baseQuery.or(`title.ilike.*${text}*,description.ilike.*${text}*`);
       }
       if (duration) {
         baseQuery.eq('duration', duration);
@@ -156,9 +149,10 @@ export default async function jobListingRoutes(
       if (experience_level) {
         baseQuery.eq('experience_level', experience_level);
       }
-      if (required_skills) {
-        baseQuery.eq('required_skills', required_skills);
-      }
+      // if (required_skills) {
+      //   console.log(required_skills)
+      //   baseQuery.likeAnyOf('required_skills', required_skills);
+      // }
       if (project_stage) {
         baseQuery.eq('project_stage', project_stage);
       }
@@ -171,12 +165,12 @@ export default async function jobListingRoutes(
       if (company) {
         baseQuery.eq('company', company);
       }
-      baseQuery.or(textSearch.join(","))
-      const {data, error} =  await baseQuery;
-      if(error){
-        return reply.status(500).send(error)
+
+      const { data, error } = await baseQuery;
+      if (error) {
+        return reply.status(500).send(error);
       }
-      return reply.send(data || [])
+      return reply.send(data || []);
     },
   });
 

@@ -1351,6 +1351,7 @@ export interface Database {
           did: string | null
           id: string
           iv: string | null
+          name: string | null
           password_encrypted_private_key: string | null
           public_key: string | null
         }
@@ -1359,6 +1360,7 @@ export interface Database {
           did?: string | null
           id: string
           iv?: string | null
+          name?: string | null
           password_encrypted_private_key?: string | null
           public_key?: string | null
         }
@@ -1367,6 +1369,7 @@ export interface Database {
           did?: string | null
           id?: string
           iv?: string | null
+          name?: string | null
           password_encrypted_private_key?: string | null
           public_key?: string | null
         }

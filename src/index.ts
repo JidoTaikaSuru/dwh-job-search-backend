@@ -9,8 +9,10 @@ import dataForwarding from './dataForwarding/index.js';
 import requesttask from './dataForwarding/requesttask.js';
 import identifierRoutes from './identifiers/index.js';
 import jobListingRoutes from './job_listing/index.js';
+import jobReplyRoutes from './job_reply/index.js';
 import presentationRoutes from './presentation/index.js';
 import proofOfWorkRoutes from './proofOfWork/index.js';
+import userRoutes from './user/index.js';
 
 export const server = fastify();
 export const supabaseClient = createClient<Database>(
@@ -88,6 +90,8 @@ server.register(proofOfWorkRoutes);
 server.register(dataForwarding);
 server.register(forwarding);
 server.register(requesttask);
+server.register(userRoutes);
+server.register(jobReplyRoutes);
 
 
 export { genericUpdate } from './lib.js';

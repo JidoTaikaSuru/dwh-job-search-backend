@@ -14,11 +14,12 @@ export const genericFetchById = async (
       .select('*')
       .eq('id', id)
       .single();
+  console.log('data', data, 'error', error);
 
   if (error) {
     return reply.status(500).send(error);
   }
-  if (data) {
+  if (!data) {
     return reply.status(404).send('Job listing not found');
   }
 
@@ -39,7 +40,7 @@ export const genericFetchAll = async (tableName: string,
 export const genericCreate = async <T>(tableName: string,
                                        body: T,
                                        reply: FastifyReply) => {
-  const { data, error } = await supabaseClient.from(tableName).insert(body);
+  const { data, error } = await supabaseClient.from(tableName).insert(body).select().single();
   if (error) {
     return reply.status(400).send(error);
   }
@@ -48,7 +49,7 @@ export const genericCreate = async <T>(tableName: string,
 export const genericUpdate = async <T>(tableName: string,
                                        body: T,
                                        reply: FastifyReply) => {
-  const { data, error } = await supabaseClient.from(tableName).update(body);
+  const { data, error } = await supabaseClient.from(tableName).update(body).select().single();
   if (error) {
     return reply.status(400).send(error);
   }
