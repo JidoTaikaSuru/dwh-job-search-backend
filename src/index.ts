@@ -14,7 +14,7 @@ import presentationRoutes from './presentation/index.js';
 import proofOfWorkRoutes from './proofOfWork/index.js';
 import userRoutes from './user/index.js';
 
-export const server = fastify();
+
 export const supabaseClient = createClient<Database>(
   'https://api.gotid.org',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVicG5ibnpwZm10YmJyZ2lnempxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcwMDA2NDM4MiwiZXhwIjoyMDE1NjQwMzgyfQ.27a4SYNhArfx-DfEypBOaz61Ywqdul1tAFQH5UFKsrg',
@@ -78,23 +78,54 @@ export const JWT_HEADER_SCHEMA_AND_PREHANDLER = {
   preHandler: jwtAuthentication,
 }
 
-await server.register(cors, {
-  origin: '*',
-});
-server.register(credentialRoutes);
-server.register(presentationRoutes);
-server.register(companyRoutes);
-server.register(jobListingRoutes);
-server.register(identifierRoutes); // You can ignore these routes, see identifiers/* for details
-server.register(proofOfWorkRoutes);
-server.register(dataForwarding);
-server.register(forwarding);
-server.register(requesttask);
-server.register(userRoutes);
-server.register(jobReplyRoutes);
+export const init =  () => {
+  const server = fastify({
+    logger: true
+  });
+  // await server.register(cors, {
+  //   origin: '*',
+  // });
+  // await server.register(credentialRoutes);
+  // await server.register(presentationRoutes);
+  // await server.register(companyRoutes);
+  // await server.register(jobListingRoutes);
+  // await server.register(identifierRoutes); // You can ignore these routes, see identifiers/* for details
+  // await server.register(proofOfWorkRoutes);
+  // await server.register(dataForwarding);
+  // await server.register(forwarding);
+  // await server.register(requesttask);
+  // await server.register(userRoutes);
+  // await server.register(jobReplyRoutes);
+  server.register(cors, {
+    origin: '*',
+  });
+  server.register(credentialRoutes);
+  server.register(presentationRoutes);
+  server.register(companyRoutes);
+  server.register(jobListingRoutes);
+  server.register(identifierRoutes); // You can ignore these routes, see identifiers/* for details
+  server.register(proofOfWorkRoutes);
+  server.register(dataForwarding);
+  server.register(forwarding);
+  server.register(requesttask);
+  server.register(userRoutes);
+  server.register(jobReplyRoutes);
+  server.get('/', async (request, reply) => {
+    return { hello: 'world' }
+  })
+  return server
+}
+//
+// if (require.main === module) {
+//   // called directly i.e. "node app"
+//   await init().listen({ port: 8080 }, (err) => {
+//     if (err) console.error(err);
+//     console.log('server listening on 3000');
+//   });
+// } else {
+//   // required as a module => executed on aws lambda
+//   module.exports = init;
+// }
 
+// module.exports = init;
 
-export { genericUpdate } from './lib.js';
-export { genericCreate } from './lib.js';
-export { genericFetchAll } from './lib.js';
-export { genericFetchById } from './lib.js';

@@ -1,11 +1,8 @@
-import { createRequire } from 'module';
 import dotenv from 'dotenv';
 import * as ethers from 'ethers';
 import * as jose from 'jose';
-
-const require = createRequire(import.meta.url);
-
-const keyto = require('@trust/keyto'); //this is the winner
+import keyto from '@trust/keyto';
+import { JWK } from 'jose';
 
 dotenv.config();
 
@@ -33,7 +30,7 @@ console.log('🚀 ~ file: index.ts:33 ~ parent_pubkey:', parent_pubkey);
 const keyJwk = keyto.from(debug_parent_privatekey, 'blk').toJwk('public');
 console.log('🚀 ~ file: index.ts:28 ~ keyJwk:', keyJwk);
 keyJwk.crv = 'secp256k1';
-const parent_jwk_pubkey = await jose.importJWK(keyJwk);
+const parent_jwk_pubkey = await jose.importJWK(keyJwk as JWK);
 
 // Eth keys should be fine for signing JWS and then also JWT
 const my_privatekey =
@@ -42,10 +39,10 @@ const my_etherswallet = new ethers.Wallet(my_privatekey); //Not sure if i need t
 const my_pubkey = my_etherswallet.address;
 const mykeyJwk = keyto.from(my_privatekey, 'blk').toJwk('private');
 mykeyJwk.crv = 'secp256k1';
-const my_jwk_privatekey = await jose.importJWK(mykeyJwk);
+const my_jwk_privatekey = await jose.importJWK(mykeyJwk as JWK);
 
 const mykeyJwk_pub = keyto.from(my_privatekey, 'blk').toJwk('public');
 mykeyJwk_pub.crv = 'secp256k1';
-const my_jwk_pubkey = await jose.importJWK(mykeyJwk_pub);
+const my_jwk_pubkey = await jose.importJWK(mykeyJwk_pub as JWK);
 
 const my_endpoint = 'localhost:8080';

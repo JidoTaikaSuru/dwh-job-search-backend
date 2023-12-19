@@ -1,5 +1,6 @@
-import {server} from './index.js';
+import {init} from './index.js';
 
+const server = await init();
 server.listen(
   {
     port: process.env['port'] ? parseInt(process.env['port']) : 8080,
