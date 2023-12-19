@@ -110,6 +110,9 @@ export const init =  () => {
   server.register(requesttask);
   server.register(userRoutes);
   server.register(jobReplyRoutes);
+  server.get('/', async (request, reply) => {
+    return { hello: 'world' }
+  })
   return server
 }
 //
