@@ -13,6 +13,7 @@ import jobReplyRoutes from './job_reply/index.js';
 import presentationRoutes from './presentation/index.js';
 import proofOfWorkRoutes from './proofOfWork/index.js';
 import userRoutes from './user/index.js';
+import proofOfLatencyRoutes from './proofOfLatency/index.js';
 
 
 export const supabaseClient = createClient<Database>(
@@ -105,6 +106,7 @@ export const init =  () => {
   server.register(jobListingRoutes);
   server.register(identifierRoutes); // You can ignore these routes, see identifiers/* for details
   server.register(proofOfWorkRoutes);
+  server.register(proofOfLatencyRoutes);
   server.register(dataForwarding);
   server.register(forwarding);
   server.register(requesttask);
