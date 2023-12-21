@@ -2,8 +2,6 @@ import { FastifyReply, FastifyRequest } from "fastify";
 import { argon2Verify } from "hash-wasm";
 import { supabaseClient } from "../index.js";
 import { DEFAULT_IDENTIFIER_SCHEMA, agent } from "../setup.js";
-import child_process from 'child_process';
-import util from 'util';
 
 export const registerDataSubscriptionEndpoint = async (
     request: FastifyRequest,
@@ -11,13 +9,13 @@ export const registerDataSubscriptionEndpoint = async (
 ) => {
 
     const clientDid = request.headers["x-client-id"];
-    const challengeHash = request.headers["x-challenge-hash"];
+    const answerHash = request.headers["x-answer-hash"];
     const endpoint = request.headers["x-client-endpoint"];
-    if (!clientDid || !challengeHash) {
+    if (!clientDid || !answerHash) {
         return reply.status(400).send(`You are missing a required header`);
     } else if (
         Array.isArray(clientDid) ||
-        Array.isArray(challengeHash)
+        Array.isArray(answerHash)
     ) {
         return reply
             .status(400)
@@ -30,7 +28,7 @@ export const registerDataSubscriptionEndpoint = async (
 
     const isValid = await argon2Verify({
         password: did + clientDid,
-        hash: challengeHash,
+        hash: answerHash,
     });
 
     if (!isValid) {

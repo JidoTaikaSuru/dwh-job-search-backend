@@ -198,11 +198,11 @@ export default async function TakeDataRoutes(
       headers: {
         type: 'object',
         properties: {
-          'x-challenge-hash': { type: 'string' },
+          'x-answer-hash': { type: 'string' },
           'x-client-id': { type: 'string' },
           'x-client-endpoint': { type: 'string' },
         },
-        required: ['x-challenge-hash', 'x-client-id', 'x-client-endpoint'],
+        required: ['x-answer-hash', 'x-client-id', 'x-client-endpoint'],
       },
     },
 
