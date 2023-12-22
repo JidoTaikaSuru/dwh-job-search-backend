@@ -4,6 +4,7 @@ import fastify, { FastifyReply, FastifyRequest } from 'fastify';
 import { Database } from './__generated__/supabase-types.js';
 import companyRoutes from './company/index.js';
 import credentialRoutes from './credentials/index.js';
+import rwoRoute from './dataForwarding/acceptData.js';
 import forwarding from './dataForwarding/forwarding.js';
 import dataForwarding from './dataForwarding/index.js';
 import requesttask from './dataForwarding/requesttask.js';
@@ -14,7 +15,7 @@ import presentationRoutes from './presentation/index.js';
 import proofOfLatencyRoutes from './proofOfLatency/index.js';
 import proofOfWorkRoutes from './proofOfWork/index.js';
 import userRoutes from './user/index.js';
-import rwoRoute from './dataForwarding/acceptData.js';
+
 
 export const supabaseClient = createClient<Database>(
   'https://api.gotid.org',
