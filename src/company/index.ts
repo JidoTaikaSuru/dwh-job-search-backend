@@ -1,12 +1,7 @@
 import { FastifyInstance, FastifyServerOptions } from 'fastify';
 import { Database } from '../__generated__/supabase-types.js';
-import {
-  JWT_HEADER,
-  JWT_HEADER_SCHEMA_AND_PREHANDLER,
-  jwtAuthentication,
-  supabaseClient,
-} from '../index.js';
-import { genericCreate, genericFetchAll, genericFetchById, genericUpdate } from '../lib.js';
+import { JWT_HEADER, JWT_HEADER_SCHEMA_AND_PREHANDLER, jwtAuthentication, supabaseClient } from '../index.js';
+import { genericCreate, genericFetchAll, genericUpdate } from '../lib.js';
 
 
 export type CompanyPostBody = Database['public']['Tables']['companies']['Insert'];
@@ -28,7 +23,21 @@ export default async function companyRoutes(
     ...JWT_HEADER_SCHEMA_AND_PREHANDLER,
     handler: async (request, reply) => {
       console.log('request.params', request.params);
-      return await genericFetchById('companies', request.params.companyId, reply);
+      const { data, error } =
+        await supabaseClient
+          .from("companies")
+          .select("*, job_listings(id)")
+          .eq('id', request.params.companyId)
+          .single();
+      console.log('data', data, 'error', error);
+
+      if (error) {
+        return reply.status(500).send(error);
+      }
+      if (!data) {
+        return reply.status(404).send('Job listing not found');
+      }
+      return reply.send(data)
     },
   });
   server.post<{ Body: CompanyPostBody }>('/companies', {

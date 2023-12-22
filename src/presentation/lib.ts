@@ -1,6 +1,6 @@
-import { IPresentationDefinition } from "@sphereon/pex";
-import { Database } from "../__generated__/supabase-types.js";
-import { stripDidPrefix } from "../credentials/lib.js";
+import { IPresentationDefinition } from '@sphereon/pex';
+import { Database } from '../__generated__/supabase-types.js';
+import { stripDidPrefix } from '../credentials/lib.js';
 
 export type PresentationDefinitionPlaceholder = {
   key: string;
@@ -39,6 +39,7 @@ export const loadUserDataPlaceholdersIntoPresentationDefinition = (
   presentationDefinition: IPresentationDefinition,
   user: Database["public"]["Tables"]["users"]["Row"],
 ) => {
+
   return loadPlaceholdersIntoPresentationDefinition(presentationDefinition, [
     {
       key: "{{user_supabase_id}}",

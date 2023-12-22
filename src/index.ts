@@ -11,9 +11,9 @@ import identifierRoutes from './identifiers/index.js';
 import jobListingRoutes from './job_listing/index.js';
 import jobReplyRoutes from './job_reply/index.js';
 import presentationRoutes from './presentation/index.js';
+import proofOfLatencyRoutes from './proofOfLatency/index.js';
 import proofOfWorkRoutes from './proofOfWork/index.js';
 import userRoutes from './user/index.js';
-import proofOfLatencyRoutes from './proofOfLatency/index.js';
 
 
 export const supabaseClient = createClient<Database>(
@@ -27,12 +27,11 @@ export const jwtAuthentication = async (
   request: FastifyRequest,
   reply: FastifyReply,
 ) => {
-  console.log('jwtAuthentication');
   const jwt = request.headers['x-access-token'] as string;
   if (!jwt) {
     return reply.status(400).send('No JWT provided');
   }
-  console.log('Getting the user behind jwt', jwt);
+  // console.log('Getting the user behind jwt', jwt);
   const { data: authData, error: authError } =
     await supabaseClient.auth.getUser(jwt);
   if (authError) {
@@ -41,14 +40,14 @@ export const jwtAuthentication = async (
   if (!authData.user) {
     return reply.status(401).send('User not found');
   }
-  console.log('User signed in as authData', authData);
+  // console.log('User signed in as authData', authData);
 
   const { data: user, error: fetchError } = await supabaseClient
     .from('users')
     .select('*')
     .eq('id', `${authData.user.id}`)
     .single();
-  console.log('data', user, 'error', fetchError);
+  // console.log('data', user, 'error', fetchError);
   if (fetchError) {
     return reply.status(400).send(fetchError);
   }
@@ -83,20 +82,6 @@ export const init =  () => {
   const server = fastify({
     logger: true
   });
-  // await server.register(cors, {
-  //   origin: '*',
-  // });
-  // await server.register(credentialRoutes);
-  // await server.register(presentationRoutes);
-  // await server.register(companyRoutes);
-  // await server.register(jobListingRoutes);
-  // await server.register(identifierRoutes); // You can ignore these routes, see identifiers/* for details
-  // await server.register(proofOfWorkRoutes);
-  // await server.register(dataForwarding);
-  // await server.register(forwarding);
-  // await server.register(requesttask);
-  // await server.register(userRoutes);
-  // await server.register(jobReplyRoutes);
   server.register(cors, {
     origin: '*',
   });
