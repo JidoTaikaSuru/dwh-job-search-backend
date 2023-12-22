@@ -43,9 +43,15 @@ const anonkey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsIn
 const supabase = await createClient(DATABASE_HOST, anonkey)
 
 const my_ethers_wallet = await ethers.Wallet.createRandom();
-const my_private_key = get_my_private_key() ?? my_ethers_wallet.privateKey;
+export const my_private_key = get_my_private_key() ?? my_ethers_wallet.privateKey;
 
 export const debug_parent_privatekey_didJWTsigner = await didJWT.ES256KSigner(didJWT.hexToBytes(my_private_key));
+
+const debug_parent_wallet = new ethers.Wallet(my_private_key)
+
+const parent_pubkey = debug_parent_wallet.address;
+
+export const debug_parent_pubkey_PKH_did = "did:pkh:eip155:1:" + parent_pubkey;
 
 export function get_my_did() {
     return "did:pkh:eip155:1:" + env_get("my_private_key");

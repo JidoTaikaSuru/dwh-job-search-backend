@@ -1,23 +1,12 @@
 import { FastifyInstance, FastifyServerOptions } from "fastify";
 import * as didJWT from 'did-jwt'; //NEW WINNER  didJWT.ES256KSigner(didJWT.hexToBytes(debug_parent_privatekey))  
-import { ethers } from "ethers";
 import { Resolver } from "did-resolver";
 import { getResolver as pkhDidResolver } from "pkh-did-resolver";
-
-import { getResolver as keyDIDResolver } from "key-did-resolver";
-import { supabaseClient } from "../index.js";
-import { debug_parent_privatekey_didJWTsigner, register_latency_check } from "../utils.js";
+import { debug_parent_pubkey_PKH_did, debug_parent_privatekey_didJWTsigner, register_latency_check } from "../utils.js";
 
 export type ProofOfLatencyHeaders = {
   "x-jwt": string;
 };
-
-const debug_parent_privatekey = process.env['debug_parent_privatekey'] ? process.env['debug_parent_privatekey'] : "2163b9e4411ad1df8720833b35dcf57ce44556280d9e020de2dc11752798fddd"
-const debug_parent_wallet = new ethers.Wallet(debug_parent_privatekey)
-
-const parent_pubkey = debug_parent_wallet.address;
-
-const debug_parent_pubkey_PKH_did = "did:pkh:eip155:1:" + parent_pubkey;
 
 // latency delta in miliseconds(?)
 const deltaLatency = 100000000;
@@ -58,12 +47,12 @@ export default async function proofOfLatencyRoutes(
       }
 
       let resolver = new Resolver({ ...pkhDidResolver() });
-
+      
       let verificationResponse = await didJWT.verifyJWT(jwt, {
         resolver,
         audience: debug_parent_pubkey_PKH_did
       });
-
+      
       let isverfied = false;
 
       if (verificationResponse.verified) {
@@ -77,7 +66,7 @@ export default async function proofOfLatencyRoutes(
       let { payload } = didJWT.decodeJWT(jwt)
 
       const currentLatency = timestamp - payload.latency_time_stamp_check;
-      if (currentLatency > deltaLatency) {
+            if (currentLatency > deltaLatency) {
         return reply.status(401).send(`Proof of latency failed ${currentLatency}`);
       }
 
@@ -90,7 +79,7 @@ export default async function proofOfLatencyRoutes(
         },
         { issuer: debug_parent_pubkey_PKH_did, signer: debug_parent_privatekey_didJWTsigner },
         { alg: 'ES256K' });
-
+      
       register_latency_check(did, currentLatency, request.ip, respondingJwt);
 
       reply.status(200).send();
