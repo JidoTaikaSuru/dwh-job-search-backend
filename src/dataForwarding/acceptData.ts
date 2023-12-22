@@ -127,3 +127,36 @@ export  async function rwoRoute(
     })
   }
   
+
+import * as didJWT from 'did-jwt'; //NEW WINNER  didJWT.ES256KSigner(didJWT.hexToBytes(debug_parent_privatekey))  
+import { Resolver } from "did-resolver";
+import { FastifyReply, FastifyRequest , FastifyServerOptions , FastifyInstance  } from 'fastify';
+import { getResolver as pkhDidResolver } from "pkh-did-resolver";
+import { debug_parent_pubkey_PKH_did, debug_parent_privatekey_didJWTsigner, register_latency_check } from "../utils.js";
+
+
+
+
+export default async function rwoRoute(
+    server: FastifyInstance,
+    options: FastifyServerOptions,
+  ) {
+    server.route({
+      method: "POST",
+      url: "/rwo",
+      schema: {
+        headers: {
+          type: "object",
+          properties: {
+          },
+          required: [],
+        },
+      },
+  
+      handler: async (request, reply) => {
+       
+        reply.status(200).send("rwo2");
+      },
+    })
+  }
+  
