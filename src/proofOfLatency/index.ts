@@ -5,21 +5,22 @@ import { Resolver } from "did-resolver";
 import { getResolver as pkhDidResolver } from "pkh-did-resolver";
 
 import { getResolver as keyDIDResolver } from "key-did-resolver";
+import { supabaseClient } from "../index.js";
+import { debug_parent_privatekey_didJWTsigner, register_latency_check } from "../utils.js";
 
 export type ProofOfLatencyHeaders = {
   "x-jwt": string;
 };
 
 const debug_parent_privatekey = process.env['debug_parent_privatekey'] ? process.env['debug_parent_privatekey'] : "2163b9e4411ad1df8720833b35dcf57ce44556280d9e020de2dc11752798fddd"
-const debug_parent_privatekey_didJWTsigner = didJWT.ES256KSigner(didJWT.hexToBytes(debug_parent_privatekey))
 const debug_parent_wallet = new ethers.Wallet(debug_parent_privatekey)
 
 const parent_pubkey = debug_parent_wallet.address;
 
 const debug_parent_pubkey_PKH_did = "did:pkh:eip155:1:" + parent_pubkey;
 
-// latency delta in miliseconds
-const deltaLatency = 1000000;
+// latency delta in miliseconds(?)
+const deltaLatency = 100000000;
 
 export default async function proofOfLatencyRoutes(
   server: FastifyInstance,
@@ -32,20 +33,24 @@ export default async function proofOfLatencyRoutes(
       headers: {
         type: "object",
         properties: {
+          "x-did": { type: "string" },
           "x-jwt": { type: "string" },
+          "x-endpoint": { type: "string" },
         },
-        required: ["x-jwt"],
+        required: ["x-jwt", "x-did", "x-endpoint"],
       },
     },
 
     handler: async (request, reply) => {
       const timestamp = Date.now();
       const jwt = request.headers["x-jwt"];
+      const did = request.headers["x-did"];
+      const endpoint = request.headers["x-endpoint"];
 
-      if (!jwt) {
+      if (!jwt || !did || !endpoint) {
         return reply.status(400).send(`You are missing a required header`);
       } else if (
-        Array.isArray(jwt)
+        Array.isArray(jwt) || Array.isArray(did) || Array.isArray(endpoint)
       ) {
         return reply
           .status(400)
@@ -69,14 +74,26 @@ export default async function proofOfLatencyRoutes(
         return reply.status(401).send("Failed to verify hash");
       }
 
-      let {payload} = didJWT.decodeJWT(jwt)
+      let { payload } = didJWT.decodeJWT(jwt)
 
       const currentLatency = timestamp - payload.latency_time_stamp_check;
       if (currentLatency > deltaLatency) {
         return reply.status(401).send(`Proof of latency failed ${currentLatency}`);
       }
 
-      reply.status(200).send({ currentLatency });
+      let respondingJwt = await didJWT.createJWT(
+        {
+          name: 'register latency check',
+          latency_time_stamp_check: timestamp,
+          result_latency: currentLatency,
+          request_ip: request.ip
+        },
+        { issuer: debug_parent_pubkey_PKH_did, signer: debug_parent_privatekey_didJWTsigner },
+        { alg: 'ES256K' });
+
+      register_latency_check(did, currentLatency, request.ip, respondingJwt);
+
+      reply.status(200).send();
     },
   }),
 
