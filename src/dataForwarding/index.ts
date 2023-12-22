@@ -18,6 +18,7 @@ export type TakeDataHeaders = {
   //"body-sha256":string;
 };
 
+//TODO change this to utils.current_endpoints_per_did    
 const trusted_pubkeys = (
   process.env['trustpklist']
     ? process.env['trustpklist']

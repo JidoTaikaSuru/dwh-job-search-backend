@@ -96,13 +96,17 @@ export async function self_mesh_node_register() {
 
 export let ENDPOINTS_PER_DID : any | null;
 
+export let current_endpoints_per_did = {}; 
 export async function query_default_bootstrap_servers() {
 
     try {
         const { data, error } = await supabase
 
             .from('current_endpoints_per_did')
-            .select()
+            .select("did,endpoint,created_at")
+
+            if(data && data.length > 0)
+                    current_endpoints_per_did = data;
 
         ENDPOINTS_PER_DID = data;
 
