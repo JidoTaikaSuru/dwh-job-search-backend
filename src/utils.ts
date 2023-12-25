@@ -94,13 +94,17 @@ export async function self_mesh_node_register() {
 
 }
 
+export let ENDPOINTS_PER_DID : any | null;
+
 export async function query_default_bootstrap_servers() {
 
     try {
         const { data, error } = await supabase
 
-            .from('mesh_node_registry')
+            .from('current_endpoints_per_did')
             .select()
+
+        ENDPOINTS_PER_DID = data;
 
         console.log("🚀 ~ file: utils.ts:86 ~ query_default_bootstrap_servers ~ data:", data)
         console.log("🚀 ~ file: utils.ts:85 ~ query_default_bootstrap_servers ~ error:", error)
