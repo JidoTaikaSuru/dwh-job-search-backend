@@ -131,14 +131,12 @@ export  async function rwoRoute(
 import * as didJWT from 'did-jwt'; //NEW WINNER  didJWT.ES256KSigner(didJWT.hexToBytes(debug_parent_privatekey))  
 import { Resolver } from "did-resolver";
 import { FastifyReply, FastifyRequest , FastifyServerOptions , FastifyInstance  } from 'fastify';
-import { getResolver as pkhDidResolver } from "pkh-did-resolver";
-import { debug_parent_pubkey_PKH_did, debug_parent_privatekey_didJWTsigner, register_latency_check, env_get, json_to_cid, add_fed_data_json, add_fed_data_binary, sign_data_jwt } from "../utils.js";
-import { decode, encode } from '@ipld/dag-json';
-import postgres from 'postgres'
 import { CID } from 'multiformats/cid'
 import * as json from 'multiformats/codecs/json'
 import { sha256 } from 'multiformats/hashes/sha2'
-import * as dag_json  from '@ipld/dag-json'
+import { getResolver as pkhDidResolver } from "pkh-did-resolver";
+import postgres from 'postgres'
+import { debug_parent_pubkey_PKH_did, debug_parent_privatekey_didJWTsigner, register_latency_check, env_get, json_to_cid, add_fed_data_json, add_fed_data_binary, sign_data_jwt } from "../utils.js";
 
 
 /*
@@ -254,5 +252,5 @@ export  async function rwoRoute(
         reply.status(200).send("rwo2");
       },
     })
-  };
+  }
   
