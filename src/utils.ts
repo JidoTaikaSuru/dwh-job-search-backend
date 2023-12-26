@@ -225,7 +225,7 @@ export async function add_fed_data_json(data:object, cid:string,author_did:strin
            
 //I'm really suprised the below works for inserting binary data... 
 export async function add_fed_data_binary(data:Uint8Array, cid:string,author_did:string,publisher_did:string,publisher_epoch:number,author_sig:string,publisher_sig:string){
-    const sql_ret = await sql `insert into fed_data_binary (cid,data,author_did,publisher_did,publisher_epoch,author_sig,publisher_sig) values (${cid},${data},${author_did},${publisher_did},${publisher_epoch},${author_sig},${publisher_sig})`
+    const sql_ret = await sql `insert into fed_data_binary (cid,data,author_did,publisher_did,publisher_epoch,author_sig,publisher_sig) values (${cid},${data},${author_did},${publisher_did},${publisher_epoch},${author_sig},${publisher_sig})`  //TODO change this to a safe binary insertion. 
     console.log("🚀 ~ file: utils.ts:188 ~ add_fed_data_binary ~ sql_ret:", sql_ret)
 }
 

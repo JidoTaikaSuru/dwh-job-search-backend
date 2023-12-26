@@ -22,22 +22,19 @@ const trusted_pubkeys = (
 )
   .replace('0x', '')
   .split(',');
-console.log('🚀 ~ file: index.ts:28 ~ trusted_pubkeys:', trusted_pubkeys);
+//console.log('🚀 ~ file: index.ts:28 ~ trusted_pubkeys:', trusted_pubkeys);
 
 //const debug_parent_privatekey ="680425c1f7cbb803be68aff2c841f654e3a2373920268231f99c95a954536ab9" // this fails
 const debug_parent_privatekey = process.env['parentpk']
   ? process.env['parentpk']
   : '2163b9e4411ad1df8720833b35dcf57ce44556280d9e020de2dc11752798fddd';
-console.log(
-  '🚀 ~ file: index.ts:30 ~ debug_parent_privatekey:',
-  debug_parent_privatekey,
-);
+//console.log( '🚀 ~ file: index.ts:30 ~ debug_parent_privatekey:', debug_parent_privatekey, );
 const debug_parent_wallet = new ethers.Wallet(debug_parent_privatekey);
 const parent_pubkey = debug_parent_wallet.address;
 console.log('🚀 ~ file: index.ts:33 ~ parent_pubkey:', parent_pubkey);
 
 const keyJwk = keyto.from(debug_parent_privatekey, 'blk').toJwk('public');
-console.log('🚀 ~ file: index.ts:28 ~ keyJwk:', keyJwk);
+//console.log('🚀 ~ file: index.ts:28 ~ keyJwk:', keyJwk);
 keyJwk.crv = 'secp256k1';
 const parent_jwk_pubkey = await jose.importJWK(keyJwk as JWK);
 

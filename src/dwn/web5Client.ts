@@ -354,6 +354,7 @@ export class DwnClient implements DwnClientFunctions {
     return japplicationList_from_others;
   }
 
+  //@ts-ignore
   async dwnQueryJApplicationsForJob() {
     const { records } = await this.web5.dwn.records.query({
       message: {
