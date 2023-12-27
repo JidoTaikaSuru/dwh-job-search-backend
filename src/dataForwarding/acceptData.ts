@@ -50,9 +50,17 @@ const sql = postgres({
         const author_sig =  request.headers['author_sig']
         const publisher_sig =  request.headers['publisher_sig']
         const publisher_epoch =  request.headers['publisher_epoch']
+        const auth_jwt =  request.headers['auth_jwt']
         console.log("🚀 ~ file: acceptData.ts:52 ~ handler: ~ publisher_epoch:", publisher_epoch)
         
-
+        if(auth_jwt){
+          //@ts-ignore
+          const decoded_auth_jwt = didJWT.decodeJWT(auth_jwt);
+          console.log("🚀 ~ file: acceptData.ts:58 ~ handler: ~ decoded_auth_jwt:", decoded_auth_jwt)
+          //TODO add jwt verification that could be from any of our trusted parents.   Get trusted parties from utils.ts current_endpoints_per_did 
+        }
+        //TODO verify publisher sig 
+        //TODO verify author sig
 
         console.log("🚀 ~ file: acceptData.ts:81 ~ handler: ~ typeof request.body:", typeof request.body)
        if( request.body && typeof request.body === 'object'){

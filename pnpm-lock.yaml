@@ -80,6 +80,9 @@ dependencies:
   drizzle-orm:
     specifier: ^0.29.1
     version: 0.29.1(@neondatabase/serverless@0.6.1)(pg@8.11.3)(postgres@3.4.3)(sqlite3@5.1.6)
+  drizzle-orm-pg:
+    specifier: ^0.16.3
+    version: 0.16.3(@neondatabase/serverless@0.6.1)(drizzle-orm@0.29.1)(pg@8.11.3)(postgres@3.4.3)
   eslint-import-resolver-typescript:
     specifier: ^3.6.1
     version: 3.6.1(@typescript-eslint/parser@6.14.0)(eslint-plugin-import@2.29.1)(eslint@8.56.0)
@@ -7071,6 +7074,31 @@ packages:
       - supports-color
       - utf-8-validate
     dev: true
+
+  /drizzle-orm-pg@0.16.3(@neondatabase/serverless@0.6.1)(drizzle-orm@0.29.1)(pg@8.11.3)(postgres@3.4.3):
+    resolution: {integrity: sha512-KohmZ3AbDP6waq3AG6+fMK7dkCmLJo2lWThioLDluveY/6E4Y44YLaWiZKg3dtq/SaawnyMa9jOy6FqLw29xyQ==}
+    deprecated: This package is merged into drizzle-orm starting from 0.17.0. See https://www.npmjs.com/package/drizzle-orm
+    peerDependencies:
+      '@neondatabase/serverless': '>=0.1 <0.2'
+      '@types/pg': '>=8 <9'
+      drizzle-orm: '>=0.16 <0.17'
+      pg: '>=8 <9'
+      postgres: '>=3 <4'
+    peerDependenciesMeta:
+      '@neondatabase/serverless':
+        optional: true
+      '@types/pg':
+        optional: true
+      pg:
+        optional: true
+      postgres:
+        optional: true
+    dependencies:
+      '@neondatabase/serverless': 0.6.1
+      drizzle-orm: 0.29.1(@neondatabase/serverless@0.6.1)(pg@8.11.3)(postgres@3.4.3)(sqlite3@5.1.6)
+      pg: 8.11.3
+      postgres: 3.4.3
+    dev: false
 
   /drizzle-orm@0.29.1(@neondatabase/serverless@0.6.1)(pg@8.11.3)(postgres@3.4.3)(sqlite3@5.1.6):
     resolution: {integrity: sha512-yItc4unfHnk8XkDD3/bdC63vdboTY7e7I03lCF1OJYABXSIfQYU9BFTQJXMMovVeb3T1/OJWwfW/70T1XPnuUA==}
