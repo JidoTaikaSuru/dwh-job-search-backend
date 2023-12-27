@@ -1,7 +1,7 @@
-
 import { createClient } from '@supabase/supabase-js'
 import * as didJWT from 'did-jwt'; //NEW WINNER  didJWT.ES256KSigner(didJWT.hexToBytes(debug_parent_privatekey))  
 import { ethers } from 'ethers';
+import axios from "axios";
 
 /*
 let js_runtime = "node";
@@ -94,24 +94,23 @@ export async function self_mesh_node_register() {
 
 }
 
-export let ENDPOINTS_PER_DID : any | null;
+export let ENDPOINTS_PER_DID: any | null;
 
 export async function query_default_bootstrap_servers() {
-
     try {
         const { data, error } = await supabase
-
             .from('current_endpoints_per_did')
             .select()
 
+        if (error) {
+            console.error("Error: Could not load endpoints per DID", error)
+            return
+        }
+
         ENDPOINTS_PER_DID = data;
-
-        console.log("🚀 ~ file: utils.ts:86 ~ query_default_bootstrap_servers ~ data:", data)
-        console.log("🚀 ~ file: utils.ts:85 ~ query_default_bootstrap_servers ~ error:", error)
     } catch (e) {
-        console.log("🚀 ~ file: utils.ts:90 ~ query_default_bootstrap_servers ~ e:", e)
+        console.error("Error: Could not load endpoints per DID", e)
     }
-
 }
 
 export async function register_latency_check(
@@ -128,10 +127,52 @@ export async function register_latency_check(
                 responding_endpoint: respondingEndpoint,
                 latency,
                 requesting_ip: ip,
-                responding_jwt : respondingJwt,
+                responding_jwt: respondingJwt,
             },
         ])
 
-        console.log("🚀 ~ file: utils.ts:101 ~ register_latency_check ~ data:", data)
-        console.log("🚀 ~ file: utils.ts:101 ~ register_latency_check ~ error:", error)
+    console.log("🚀 ~ file: utils.ts:101 ~ register_latency_check ~ data:", data)
+    console.log("🚀 ~ file: utils.ts:101 ~ register_latency_check ~ error:", error)
+}
+
+export function getRandomEndpoint() {
+    try {
+
+        //TODO pick the endpoint among the least connected
+        const randomEndpointPerDid = ENDPOINTS_PER_DID[Math.floor(Math.random() * ENDPOINTS_PER_DID.length)]
+        console.log("🚀 ~ file: utils.ts:143 ~ getRandomEndpoint ~ randomEndpointPerDid:", randomEndpointPerDid)
+        if (randomEndpointPerDid.endpoint) {
+            return randomEndpointPerDid.endpoint.endsWith('\\') ? randomEndpointPerDid.endpoint.slice(0, -1) : randomEndpointPerDid.endpoint;
+        }
+    }
+    catch (e) {
+        console.error("Can't get random endpoint:", e);
+    }
+}
+
+export async function set_interval_heartbeat_check_job() {
+
+    setInterval(async () => {
+        const requestingDid = get_my_did();
+        const requestingEndpoint = env_get("my_endpoint");
+        const randomEndpoint = getRandomEndpoint();
+
+        const { data } = await axios.get(
+            `${randomEndpoint}/getProofOfLatency`,
+            undefined);
+
+        const postResult = await axios.post(
+            `${randomEndpoint}/postProofOfLatency`,
+            {},
+            {
+                headers: {
+                    "x-did": requestingDid,
+                    "x-jwt": data.jwt,
+                    "x-endpoint": requestingEndpoint,
+                    "Content-Type": "application/json"
+                },
+            });
+
+        return postResult.data;
+    }, 3600000);
 }
