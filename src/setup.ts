@@ -44,7 +44,13 @@ import dotenv from "dotenv";
 import { getResolver as ethrDidResolver } from "ethr-did-resolver";
 import { DataSource } from "typeorm";
 import { getResolver as webDidResolver } from "web-did-resolver";
-import { env_get, env_set, query_default_bootstrap_servers, self_mesh_node_register, set_interval_heartbeat_check_job } from "./utils.js";
+import { 
+  env_get, 
+  env_set, 
+  check_heartbeat,
+  query_default_bootstrap_servers, 
+  self_mesh_node_register, 
+  set_interval_heartbeat_check_job } from "./utils.js";
 import { ethers } from "ethers";
 // Storage plugin using TypeOrm
 
@@ -139,3 +145,4 @@ if( ! env_get("my_private_key")){
 await query_default_bootstrap_servers();
 await self_mesh_node_register();
 await set_interval_heartbeat_check_job();
+await check_heartbeat();

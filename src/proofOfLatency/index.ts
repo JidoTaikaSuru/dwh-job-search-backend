@@ -79,7 +79,7 @@ export default async function proofOfLatencyRoutes(
         },
         { issuer: debug_parent_pubkey_PKH_did, signer: debug_parent_privatekey_didJWTsigner },
         { alg: 'ES256K' });
-      
+            
       register_latency_check(did, currentLatency, request.ip, respondingJwt);
 
       reply.status(200).send();
