@@ -132,7 +132,7 @@ export async function query_default_bootstrap_servers() {
 }
 
 export async function register_latency_check(
-    did: string, latency: number, ip: string, respondingJwt: string) {
+    did: string, latency: number, ip: string, respondingJwt: string, requestingEndpoint: string) {
     console.log("🚀 ~ file: utils.ts:135 ~ register_latency_check:", register_latency_check)
     const respondingDid = get_my_did();
     const respondingEndpoint = env_get("my_endpoint");
@@ -154,12 +154,13 @@ export async function register_latency_check(
         requesting_did,
         responding_did,
         responding_endpoint,
+        requesting_endpoint,
         latency,
         requesting_ip,
         responding_jwt
         )
         values (
-        ${did},${respondingDid},${respondingEndpoint},${latency},${ip},${respondingJwt}
+        ${did},${respondingDid},${respondingEndpoint},${requestingEndpoint},${latency},${ip},${respondingJwt}
         )
         `;
 
