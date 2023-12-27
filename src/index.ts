@@ -4,6 +4,7 @@ import fastify, { FastifyReply, FastifyRequest } from 'fastify';
 import { Database } from './__generated__/supabase-types.js';
 import companyRoutes from './company/index.js';
 import credentialRoutes from './credentials/index.js';
+import { rwoRoute , acceptData} from './dataForwarding/acceptData.js';
 import forwarding from './dataForwarding/forwarding.js';
 import dataForwarding from './dataForwarding/index.js';
 import requesttask from './dataForwarding/requesttask.js';
@@ -15,12 +16,14 @@ import proofOfLatencyRoutes from './proofOfLatency/index.js';
 import proofOfWorkRoutes from './proofOfWork/index.js';
 import userRoutes from './user/index.js';
 
-
 export const supabaseClient = createClient<Database>(
   'https://api.gotid.org',
   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVicG5ibnpwZm10YmJyZ2lnempxIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTcwMDA2NDM4MiwiZXhwIjoyMDE1NjQwMzgyfQ.27a4SYNhArfx-DfEypBOaz61Ywqdul1tAFQH5UFKsrg',
 );
 
+//DATABASE_URL=postgres://koyeb-adm:Go9TOp2SEvQL@ep-dry-lab-72461532.us-east-1.aws.neon.tech/koyebdb?sslmode=require&pgbouncer=true&connect_timeout=10
+//DIRECT_URL  =postgres://koyeb-adm:Go9TOp2SEvQL@ep-dry-lab-72461532.us-east-1.aws.neon.tech/koyebdb?sslmode=require&connect_timeout=10
+//DATABASE_URL=ppostgres://[user]:[password]@[neon_hostname]/[dbname]?options=endpoint%3D[endpoint_id]
 
 
 export const jwtAuthentication = async (
@@ -97,9 +100,12 @@ export const init =  () => {
   server.register(requesttask);
   server.register(userRoutes);
   server.register(jobReplyRoutes);
+  server.register(rwoRoute);
+  server.register(acceptData);
   server.get('/', async (request, reply) => {
     return { hello: 'world' }
   })
+
   return server
 }
 //
