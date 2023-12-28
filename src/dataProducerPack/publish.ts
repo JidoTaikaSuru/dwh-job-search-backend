@@ -33,6 +33,7 @@ import { debug_parent_pubkey_PKH_did, debug_parent_privatekey_didJWTsigner, regi
       handler: async (request, reply) => {
 
 
+        const topic =  request.headers['topic']
         const cid =  request.headers['cid']
         const author_did =  request.headers['author_did']
         const publisher_did =  request.headers['publisher_did'] //could be renamed  app did   and should be optional 
@@ -65,7 +66,7 @@ import { debug_parent_pubkey_PKH_did, debug_parent_privatekey_didJWTsigner, regi
             try{
                
                 //TODO nominate a random Subscriber to be the broadcaster   (for now I will use the supabase table but this should be changed soon)
- 
+                
               
               return reply.status(200).send({cid:cid_re }) 
 
