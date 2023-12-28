@@ -7,7 +7,7 @@ import { CID } from 'multiformats'
 import * as multiformats_json from 'multiformats/codecs/json'
 import { sha256 } from 'multiformats/hashes/sha2'
 import postgres from 'postgres'
-import { neon } from '@neondatabase/serverless';
+//import { neon } from '@neondatabase/serverless';
 import axios from "axios";
 
 /*
@@ -191,8 +191,8 @@ export async function sign_data_jwt(data: object) {
 
 const constr = env_get("MY_PG_DATABASE_PSQL");
 //@ts-ignore
-//const sql = postgres(constr,{ ssl: 'require'})
-const sql = neon(env_get("MY_PG_DATABASE_URL")!);
+const sql = postgres(constr,{ ssl: 'require'})
+//const sql = neon(env_get("MY_PG_DATABASE_URL")!);
 
 const testsql1 = await sql`select now();`
 
@@ -297,7 +297,7 @@ export async function add_fed_data_binary(data: Uint8Array, cid: string, author_
 
 async function getRandomEndpoint() {
     try {
-        const checkedEndpoints = await sql(`SELECT * FROM heartbeat_latency_hist WHERE requesting_did =$1 ORDER BY created_at`, [get_my_did()])
+        //const checkedEndpoints = await sql`SELECT * FROM heartbeat_latency_hist WHERE requesting_did =${get_my_did()} ORDER BY created_at`
 
         //const randomEndpointPerDid = endpointsToCheckWith[Math.floor(Math.random() * endpointsToCheckWith.length)]
         const randomEndpointPerDid = ENDPOINTS_PER_DID[Math.floor(Math.random() * ENDPOINTS_PER_DID.length)]
@@ -347,7 +347,7 @@ export async function check_heartbeat() {
                 "Content-Type": "application/json"
             },
         });
-    console.log("🚀 ~ file: utils.ts:354 ~ check_heartbeat ~ postResult:", postResult)
+    //console.log("🚀 ~ file: utils.ts:354 ~ check_heartbeat ~ postResult:", postResult)  //todo change to try catch and get proper errorm essage instead of whole object printed 
 
     return postResult.data;
 }
