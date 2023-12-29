@@ -144,7 +144,7 @@ export async function self_mesh_node_register() {
         body: '{"a":"a"}'
       };
       
-      const res = await fetch(env_get("target_parent_tier1_endpoint"), options)
+      const res = await fetch(env_get("target_parent_tier1_endpoint")+"/register", options)
       //TODO save this to global variable and start using this JWT in all communication with Tier1 node.
       const res_text = await res.text();
       if( res.status==200 && res_text  && res_text.length >0){
