@@ -2,7 +2,11 @@
   "name": "vc-api",
   "version": "1.0.0",
   "description": "",
+  "type": "module",
   "main": "server.js",
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
   "scripts": {
     "dev": "tsc-watch --project . --outDir ./dist --onSuccess \"nodemon ./dist/src/server.js\"",
     "dev-a": "port=8081 parentpk=2163b9e4411ad1df8720833b35dcf57ce44556280d9e020de2dc11752798ff9c tsc-watch --project . --outDir ./dist --onSuccess \"nodemon ./dist/src/server.js\"",
@@ -15,12 +19,10 @@
     "eslint-check": "eslint . --ext .ts",
     "eslint-fix": "eslint . --ext .ts --fix",
     "build": "tsc --project .",
+    "build:rust": "cargo-cp-artifact -ac rust-lib src/rust-lib/index.node -- cargo build --manifest-path ./src/rust-lib/Cargo.toml --message-format=json-render-diagnostics --release",
     "start": "node ./dist/src/server.js",
     "start-serverless": "node ./dist/api/serverless.js"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "@fastify/aws-lambda": "^3.5.0",
     "@fastify/cors": "^8.4.1",
@@ -65,7 +67,6 @@
     "typescript": "^5.2.2",
     "web-did-resolver": "^2.0.27"
   },
-  "type": "module",
   "devDependencies": {
     "@types/node": "^20.10.4",
     "@types/trust__keyto": "^1.0.4",
@@ -77,6 +78,8 @@
     "eslint-plugin-import": "^2.29.0",
     "eslint-plugin-prettier": "^5.0.1",
     "fastify-tsconfig": "^2.0.0",
+    "cargo-cp-artifact": "^0.1.8",
+
     "lefthook": "^1.5.5",
     "nodemon": "^3.0.1",
     "prettier": "^3.1.1",

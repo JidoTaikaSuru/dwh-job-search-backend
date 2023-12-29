@@ -4,9 +4,10 @@ import fastify, { FastifyReply, FastifyRequest } from 'fastify';
 import { Database } from './__generated__/supabase-types.js';
 import companyRoutes from './company/index.js';
 import credentialRoutes from './credentials/index.js';
-import { rwoRoute , acceptData} from './dataForwarding/acceptData.js';
+import { acceptData, rwoRoute } from './dataForwarding/acceptData.js';
 import forwarding from './dataForwarding/forwarding.js';
 import dataForwarding from './dataForwarding/index.js';
+import registerApi from './dataForwarding/register.js';
 import requesttask from './dataForwarding/requesttask.js';
 import identifierRoutes from './identifiers/index.js';
 import jobListingRoutes from './job_listing/index.js';
@@ -14,8 +15,8 @@ import jobReplyRoutes from './job_reply/index.js';
 import presentationRoutes from './presentation/index.js';
 import proofOfLatencyRoutes from './proofOfLatency/index.js';
 import proofOfWorkRoutes from './proofOfWork/index.js';
+import { rustLib } from './rust.js';
 import userRoutes from './user/index.js';
-import registerApi from './dataForwarding/register.js';
 
 export const supabaseClient = createClient<Database>(
   'https://api.gotid.org',
@@ -106,7 +107,7 @@ export const init =  () => {
   server.register(registerApi);
   
   server.get('/', async (request, reply) => {
-    return { hello: 'world' }
+    return reply.send(rustLib.hello());
   })
 
   return server
