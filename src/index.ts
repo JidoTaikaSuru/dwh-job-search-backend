@@ -15,7 +15,6 @@ import jobReplyRoutes from './job_reply/index.js';
 import presentationRoutes from './presentation/index.js';
 import proofOfLatencyRoutes from './proofOfLatency/index.js';
 import proofOfWorkRoutes from './proofOfWork/index.js';
-import { rustLib } from './rust.js';
 import userRoutes from './user/index.js';
 
 export const supabaseClient = createClient<Database>(
@@ -105,10 +104,10 @@ export const init =  () => {
   server.register(rwoRoute);
   server.register(acceptData);
   server.register(registerApi);
-  
-  server.get('/', async (request, reply) => {
-    return reply.send(rustLib.hello());
-  })
+
+  // server.get('/', async (request, reply) => {
+  //   return reply.send(rustLib.hello());
+  // })
 
   return server
 }
