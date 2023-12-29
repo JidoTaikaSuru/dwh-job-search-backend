@@ -160,9 +160,7 @@ export async function self_mesh_node_register() {
     }
     catch(e){
         console.log("🚀 ~ file: utils.ts:130 ~ self_mesh_node_register ~ e:", e)
-        console.log("🚀 ~ file: utils.ts:130 ~ self_mesh_node_register ~ e.statusText:", e.statusText)
-        console.log("🚀 ~ file: utils.ts:130 ~ self_mesh_node_register ~ e.status:", e.status)
-        
+        console.log("🚀 ~ file: utils.ts:130 ~ self_mesh_node_register ~ e.cause.errors:", e.cause.errors)
     }
     //consol
 
@@ -448,8 +446,24 @@ export async  function  verify_argon_pow(answerHash:string,their_did:string){ //
 
 
 
+if( env_get("target_parent_tier1_endpoint").substring(0,4)!== "http"){
+    env_set("target_parent_tier1_endpoint","https://"+env_get("target_parent_tier1_endpoint"))
+    console.log(" automatically prepended https://  to your Tier1 endpoint b/c it was missing. it is now target_parent_tier1_endpoint= "+env_get("target_parent_tier1_endpoint"))
+    //TODO do a check that https is working on the node 
+}
 
-if(!env_get("POW_ANSWER")){ //bookmark
+
+
+if( env_get("my_endpoint").substring(0,4)!== "http"){
+    env_set("my_endpoint","https://"+env_get("my_endpoint"))
+    console.log(" automatically prepended https://  to your Self endpoint b/c it was missing. it is now  my_endpoint= "+env_get("my_endpoint"))
+    //TODO do a check that https is working on the node 
+}
+
+
+
+if(!env_get("POW_ANSWER")){  
+
 
 
     const target_parent_tier1_endpoint = env_get('target_parent_tier1_endpoint');
