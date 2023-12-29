@@ -143,6 +143,13 @@ if( ! env_get("my_private_key")){
 }
 
 await query_default_bootstrap_servers();
-await self_mesh_node_register();
+if( env_get("SKIP_REGISTATION") === "TRUE" ){
+  console.log("Skipping registration")
+}
+  else{
+    await self_mesh_node_register();
+  }
 await set_interval_heartbeat_check_job();
 await check_heartbeat();
+
+console.log("SKIP_REGISTATION="+env_get("SKIP_REGISTATION"))

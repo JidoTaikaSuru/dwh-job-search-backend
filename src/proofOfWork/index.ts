@@ -125,7 +125,7 @@ export const do_proofOfWork = async (
 
     const answerHex = Buffer.from(lastPart, 'base64').toString('hex');
 
-    if ((answerHex.match(/00000/g) || []).length > 0) {
+    if ((answerHex.match(/0000/g) || []).length > 0) {
       
       console.log("🚀 ~ file: do Proof OF work  success after iteration:", iteration)
       return { answerHash };

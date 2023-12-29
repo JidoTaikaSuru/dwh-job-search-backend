@@ -433,7 +433,7 @@ export async  function  verify_argon_pow(answerHash:string,their_did:string){ //
     const answerHex = Buffer.from(lastPart, 'base64').toString('hex');
     console.log("🚀 ~ file: utils.ts:121 ~ self_mesh_node_register ~ answerHex:", answerHex)
 
-    if( (answerHex.match(/00000/g) || []).length > 0) {
+    if( (answerHex.match(/0000/g) || []).length > 0) {
     
     const isValid = await argon2Verify({
       password: get_my_did()+their_did,
