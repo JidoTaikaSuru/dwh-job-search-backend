@@ -1,6 +1,7 @@
 import { FastifyInstance, FastifyServerOptions } from "fastify";
-import { argon2Verify } from "hash-wasm";
+import { argon2Verify, argon2id } from "hash-wasm";
 import { agent, DEFAULT_IDENTIFIER_SCHEMA } from "../setup.js";
+import { Buffer } from 'node:buffer';
 
 export type ProofOfWorkHeaders = {
   "x-challenge-hash": string;
@@ -88,3 +89,49 @@ export default async function proofOfWorkRoutes(
       },
     });
 }
+
+
+
+
+export const do_proofOfWork = async (
+  validatorDid: string,
+  myDid: string,
+): Promise<{ answerHash: string }> => {
+  const randomHexString = () => {
+    let size = Math.floor(Math.random() * Math.floor(500));
+    size = size >= 16 ? size : 16;
+    const randomString = [...Array(size)]
+      .map(() => Math.floor(Math.random() * 16).toString(16))
+      .join('');
+    return Buffer.from(randomString).toString('hex');
+  };
+
+  let answerHash = '';
+
+  const startTime = Date.now();
+  let iteration = 0;
+  do {
+    answerHash = await argon2id({
+      password: validatorDid + myDid,
+      salt: randomHexString(),
+      parallelism: 2,
+      iterations: 1,
+      memorySize: 1000,
+      hashLength: 32, // output size = 32 bytes
+      outputType: 'encoded',
+    });
+
+    const lastPart = answerHash.substring(answerHash.lastIndexOf('$') + 1, answerHash.length);
+
+    const answerHex = Buffer.from(lastPart, 'base64').toString('hex');
+
+    if ((answerHex.match(/00000/g) || []).length > 0) {
+      
+      console.log("🚀 ~ file: do Proof OF work  success after iteration:", iteration)
+      return { answerHash };
+    }
+    iteration++;
+  } while (Date.now() - startTime < 500000);
+
+  throw new Error('Time Out ~ proofOfWork ~ ');
+};

@@ -1,14 +1,18 @@
-
 import * as dag_json from '@ipld/dag-json'
 import { createClient } from '@supabase/supabase-js'
+import axios from "axios";
 import * as didJWT from 'did-jwt'; //NEW WINNER  didJWT.ES256KSigner(didJWT.hexToBytes(debug_parent_privatekey))  
 import { ethers } from 'ethers';
+import { argon2Verify } from "hash-wasm";
 import { CID } from 'multiformats'
 import * as multiformats_json from 'multiformats/codecs/json'
 import { sha256 } from 'multiformats/hashes/sha2'
 import postgres from 'postgres'
+import { do_proofOfWork } from './proofOfWork/index.js';
+
+
 //import { neon } from '@neondatabase/serverless';
-import axios from "axios";
+
 
 /*
 let js_runtime = "node";
@@ -50,11 +54,19 @@ const anonkey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsIn
 const supabase = await createClient(DATABASE_HOST, anonkey)
 
 
+export function get_my_private_key() {
+    return env_get("my_private_key");
+}
+
+
 let tmpkey = get_my_private_key();
 const my_ethers_wallet = tmpkey ? new ethers.Wallet(tmpkey) : await ethers.Wallet.createRandom();
 export const my_private_key = my_ethers_wallet.privateKey;
-export const my_pub_key = my_ethers_wallet.privateKey;
+export const my_pub_key = my_ethers_wallet.address;
 
+export function get_my_did() {
+    return "did:pkh:eip155:1:" + my_pub_key;
+}
 
 
 export const my_privatekey_didJWTsigner = await didJWT.ES256KSigner(didJWT.hexToBytes(my_private_key));
@@ -63,17 +75,12 @@ export const debug_parent_privatekey_didJWTsigner = await didJWT.ES256KSigner(di
 
 const debug_parent_wallet = new ethers.Wallet(my_private_key)
 
-const parent_pubkey = debug_parent_wallet.address;
+const parent_pubkey = debug_parent_wallet.address; // todo remove 
 
 export const debug_parent_pubkey_PKH_did = "did:pkh:eip155:1:" + parent_pubkey;
 
-export function get_my_did() {
-    return "did:pkh:eip155:1:" + env_get("my_private_key");
-}
+export let CURRENT_TIER1_REGISTRATION_JWT="";
 
-export function get_my_private_key() {
-    return env_get("my_private_key");
-}
 
 export async function self_mesh_node_register() {
     let cur_ip;
@@ -99,7 +106,67 @@ export async function self_mesh_node_register() {
 
     }
 
+  
+    
+    //bookmark
 
+
+    //    const their_pol = request.headers["proof-of-latency"];  //latency from our own node. 
+
+
+    try{
+
+        /*
+    const postResult = await axios.post(
+        `${env_get('target_parent_tier1_endpoint')}/register`,
+        {},
+        {
+            headers: {
+                "endpoint": env_get("my_endpoint"),
+                "proof-of-work-result": env_get("POW_ANSWER"),
+                "did": get_my_did(),
+                "Content-Type": "application/json"
+            },
+        });
+    console.log("🚀 ~ file: utils.ts:126 ~ self_mesh_node_register ~ postResult:", postResult)
+    */
+
+    
+    const options = {
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+          'endpoint': env_get("my_endpoint"),
+          'proof-of-work-result': env_get("POW_ANSWER"),
+          'proof-of-latency': 'asdasd',
+          'did':get_my_did()
+        },
+        body: '{"a":"a"}'
+      };
+      
+      const res = await fetch('http://localhost:8081/register', options)
+      //TODO save this to global variable and start using this JWT in all communication with Tier1 node.
+      const res_text = await res.text();
+      if( res.status==200 && res_text  && res_text.length >0){
+        CURRENT_TIER1_REGISTRATION_JWT=res_text;
+        console.log("🚀 ~ file: utils.ts:145 ~ self_mesh_node_register ~ res_text:", res_text) 
+      }
+    
+      console.log("🚀 ~ file: utils.ts:130 ~ self_mesh_node_register ~ res.statusText:", res.statusText)
+      console.log("🚀 ~ file: utils.ts:130 ~ self_mesh_node_register ~ res.status:", res.status)
+   
+
+
+    }
+    catch(e){
+        console.log("🚀 ~ file: utils.ts:130 ~ self_mesh_node_register ~ e:", e)
+        console.log("🚀 ~ file: utils.ts:130 ~ self_mesh_node_register ~ e.statusText:", e.statusText)
+        console.log("🚀 ~ file: utils.ts:130 ~ self_mesh_node_register ~ e.status:", e.status)
+        
+    }
+    //consol
+
+    //TODO remove this
     const { data, error } = await supabase
         .from('mesh_node_registry')
         .insert([
@@ -295,6 +362,12 @@ export async function add_fed_data_binary(data: Uint8Array, cid: string, author_
     console.log("🚀 ~ file: utils.ts:188 ~ add_fed_data_binary ~ sql_ret:", sql_ret)
 }
 
+export async function insert_into_mesh_node_registry(did: string, endpoint: string ) {
+    const sql_ret = await sql`insert into mesh_node_registry (did, endpoint) values (${did}, ${endpoint})`  
+    console.log("🚀 ~ file: utils.ts:303 ~ insert_into_mesh_node_registry ~ sql_ret:", sql_ret)
+}
+   
+
 async function getRandomEndpoint() {
     try {
         //const checkedEndpoints = await sql`SELECT * FROM heartbeat_latency_hist WHERE requesting_did =${get_my_did()} ORDER BY created_at`
@@ -351,3 +424,59 @@ export async function check_heartbeat() {
 
     return postResult.data;
 }
+
+
+
+export async  function  verify_argon_pow(answerHash:string,their_did:string){ //TODO make the number of 00000 variable 
+    console.log("🚀 ~ file: utils.ts:418 ~ verify_argon_pow ~ input  "+  their_did+" "+get_my_did())
+    const lastPart = answerHash.substring(answerHash.lastIndexOf('$') + 1, answerHash.length);
+    const answerHex = Buffer.from(lastPart, 'base64').toString('hex');
+    console.log("🚀 ~ file: utils.ts:121 ~ self_mesh_node_register ~ answerHex:", answerHex)
+
+    if( (answerHex.match(/00000/g) || []).length > 0) {
+    
+    const isValid = await argon2Verify({
+      password: get_my_did()+their_did,
+      hash: answerHash,
+    });
+    console.log("🚀 ~ file: utils.ts:428 ~ verify_argon_pow ~ isValid:", isValid)
+    return isValid;
+    }
+    else 
+        return false;
+  }
+
+
+
+
+if(!env_get("POW_ANSWER")){ //bookmark
+
+
+    const target_parent_tier1_endpoint = env_get('target_parent_tier1_endpoint');
+    const target_parent_tier1_did = env_get('target_parent_tier1_did');
+    console.log("🚀 ~ file: utils.ts:113 ~ self_mesh_node_register ~ pow inputs:"+ target_parent_tier1_did+" "+get_my_did() )
+
+    const {answerHash}= await do_proofOfWork(target_parent_tier1_did,get_my_did() )  
+    console.log("🚀 ~ file: utils.ts:115 ~ self_mesh_node_register ~ answerHash:", answerHash)
+
+
+    const lastPart = answerHash.substring(answerHash.lastIndexOf('$') + 1, answerHash.length);
+    const answerHex = Buffer.from(lastPart, 'base64').toString('hex');
+    console.log("🚀 ~ file: utils.ts:121 ~ self_mesh_node_register ~ answerHex:", answerHex)
+
+
+    const isValid = await argon2Verify({
+        password: target_parent_tier1_did + get_my_did(),
+        hash: answerHash,
+      });
+    console.log("🚀 ~ file: utils.ts:122 ~ self_mesh_node_register ~ isValid:", isValid)
+
+    env_set("POW_ANSWER",answerHash)
+}
+ 
+  
+
+console.log(" env var POW_ANSWER: " +  env_get("POW_ANSWER"));
+console.log("Server my_did: " +  get_my_did());
+
+//await self_mesh_node_register()

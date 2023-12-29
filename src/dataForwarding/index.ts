@@ -6,8 +6,7 @@ import { FastifyInstance, FastifyServerOptions } from 'fastify';
 import { sha256 } from 'hash-wasm';
 import * as jose from 'jose';
 import { supabaseClient } from '../index.js';
-
-import { registerDataSubscriptionEndpoint } from './register.js';
+//import { registerApi } from './register.js';
 import { JWK } from 'jose';
 
 
@@ -189,6 +188,7 @@ export default async function TakeDataRoutes(
     },
   });
 
+  /*
   server.route({
     method: 'POST',
     url: '/registerDataSubscriptionEndpoint',
@@ -206,4 +206,5 @@ export default async function TakeDataRoutes(
 
     handler: registerDataSubscriptionEndpoint,
   });
+  */
 }

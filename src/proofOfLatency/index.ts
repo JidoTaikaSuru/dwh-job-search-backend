@@ -1,6 +1,6 @@
-import { FastifyInstance, FastifyServerOptions } from "fastify";
 import * as didJWT from 'did-jwt'; //NEW WINNER  didJWT.ES256KSigner(didJWT.hexToBytes(debug_parent_privatekey))  
 import { Resolver } from "did-resolver";
+import { FastifyInstance, FastifyServerOptions } from "fastify";
 import { getResolver as pkhDidResolver } from "pkh-did-resolver";
 import { debug_parent_pubkey_PKH_did, debug_parent_privatekey_didJWTsigner, register_latency_check } from "../utils.js";
 

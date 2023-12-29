@@ -15,6 +15,7 @@ import presentationRoutes from './presentation/index.js';
 import proofOfLatencyRoutes from './proofOfLatency/index.js';
 import proofOfWorkRoutes from './proofOfWork/index.js';
 import userRoutes from './user/index.js';
+import registerApi from './dataForwarding/register.js';
 
 export const supabaseClient = createClient<Database>(
   'https://api.gotid.org',
@@ -102,6 +103,8 @@ export const init =  () => {
   server.register(jobReplyRoutes);
   server.register(rwoRoute);
   server.register(acceptData);
+  server.register(registerApi);
+  
   server.get('/', async (request, reply) => {
     return { hello: 'world' }
   })

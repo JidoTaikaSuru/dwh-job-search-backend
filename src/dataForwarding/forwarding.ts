@@ -66,21 +66,7 @@ export default async function TakeDataRoutes(
         },
         required: ['producer_jwt'],
       },
-      //   body: {
-      //     type: "object",
-      //     properties: {
-      //       targets: {
-      //         type: "string",
-      //       },
-      //       payload: {
-      //         type: "string",
-      //       },
-      //       payload_sig: {
-      //         type: "string",
-      //       },
-      //     },
-      //     required: ["payload_sig","payload","targets"],
-      //   },
+
     },
 
     handler: async (request, reply) => {

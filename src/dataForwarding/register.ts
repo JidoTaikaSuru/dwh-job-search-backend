@@ -1,75 +1,73 @@
-import { FastifyReply, FastifyRequest } from "fastify";
+import { decode, encode } from '@ipld/dag-json';
+import * as dag_json  from '@ipld/dag-json'
+import * as didJWT from 'did-jwt'; 
+import { FastifyInstance, FastifyReply, FastifyRequest, FastifyServerOptions } from "fastify";
 import { argon2Verify } from "hash-wasm";
 import { supabaseClient } from "../index.js";
 import { DEFAULT_IDENTIFIER_SCHEMA, agent } from "../setup.js";
-
-export const registerDataSubscriptionEndpoint = async (
-    request: FastifyRequest,
-    reply: FastifyReply,
-) => {
-
-    const clientDid = request.headers["x-client-id"];
-    const answerHash = request.headers["x-answer-hash"];
-    const endpoint = request.headers["x-client-endpoint"];
-    const req_jwt = request.headers["req-jwt"]; //JWT from the entity trying to register... this would be better if its done by a middleware.  
-    if (!clientDid || !answerHash) {
-        return reply.status(400).send(`You are missing a required header`);
-    } else if (
-        Array.isArray(clientDid) ||
-        Array.isArray(answerHash)
-    ) {
-        return reply
-            .status(400)
-            .send("You passed the same authorization header more than once");
-    }
+import { get_my_did, insert_into_mesh_node_registry, sign_data_jwt, verify_argon_pow } from "../utils.js";
 
 
+export default  async function registerApi(
+    server: FastifyInstance,
+    options: FastifyServerOptions,
+  ) {
+    server.route({
+      method: "POST",
+      url: "/register",
+      schema: {
+        headers: {
+          type: "object",
+          properties: {
+          },
+          required: [],
+        },
+      },
+  
+      handler: async (request, reply) => {
+       
 
-    //TODO @roman  could you change the below to check that they did the proof of work and proof of latency 
-    const { did } = await agent.didManagerGetByAlias({
-        alias: DEFAULT_IDENTIFIER_SCHEMA,
-    });
+        const their_did = request.headers["did"];
+        console.log("🚀 ~ file: register.ts:31 ~ handler: ~ their_did:", their_did)
+        if(!their_did){
+            return reply.status(401).send("missing header did");
+        }
+        const their_endpoint = request.headers["endpoint"];
+        const their_pow = request.headers["proof-of-work-result"];   //pow  related to our did 
+        const their_pol = request.headers["proof-of-latency"];  //latency from our own node. 
+        //const req_jwt = request.headers["req-jwt"]; 
 
-    const isValid = await argon2Verify({
-        password: did + clientDid,
-        hash: answerHash,
-    });
 
-    if (!isValid) {
-        return reply.status(401).send("Failed to verify hash");
-    }
+//BOOKMARK 
 
-    //TODO ping endpoint
+        //@ts-ignore
+        //const decoded_pol = didJWT.decodeJWT(their_pol); //TODO check that the jwt came from us    decoded_pol.author === mydid 
+        //console.log("🚀 ~ file: register.ts:111 ~ handler: ~ decoded_pol:", decoded_pol)
+        
+        const check_pol = true
+        if( !check_pol){
+            return reply.status(401).send("access denied check proof of latency");
+        }
+         
 
-    const pingLatency = 300;
+        //@ts-ignore
+        const correctpow=await verify_argon_pow(their_pow , their_did )
+        console.log("🚀 ~ file: register.ts:51 ~ handler: ~ correctpow:", correctpow)
 
-    /*
-    const exec = util.promisify(child_process.exec);
-    const { stdout, stderr } = await exec(`ping -c 1 ${endpoint}`);
+        if(correctpow){
+            //@ts-ignore
+         insert_into_mesh_node_registry(their_did,  their_endpoint)
 
-    var lat = stdout.match(/("time=")\d(" ms")+/g)?.[0];
-    console.log("🚀 ~ file: register.ts:44 ~ lat:", lat)
-    
-    var pingLatency = +stdout.substring(stdout.indexOf("time="), stdout.indexOf(" ms"));
-    console.log("🚀 ~ file: register.ts:44 ~ pingLatency:", pingLatency)
-*/
+        const timestamp = Date.now();
+        const jwt_for_successful_register_from_me =  await sign_data_jwt ({ aud: their_did, iat: timestamp, name: 'Registered With 1PoW and 1PoL' } ) 
+         return reply.status(200).send(jwt_for_successful_register_from_me);
+        } 
+        else {
+            return reply.status(401).send("access denied check proof of work");
+        }
 
-    if (pingLatency > 1000) {
-        return reply.status(400)
-            .send(`Latency check failed! Expected latency <= 1s (1000 ms). Current latency is ${pingLatency}`);
-    }
 
-    const send_data: any = {
-        endpoint: endpoint,
-        did: clientDid,
-        last_latency: pingLatency,
-    };
-
-    const { error } = await supabaseClient.from("data_subscribers").upsert(send_data);
-
-    if (error) {
-        return reply.status(400).send(error);
-    }
-
-    return reply.status(200);
-}
+       
+      },
+    })
+  }
