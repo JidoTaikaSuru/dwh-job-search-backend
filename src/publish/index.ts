@@ -46,7 +46,12 @@ export default async function publishApi(
                 return reply.status(401).send("can not verify JWT");
             }
 
-            await save_publish_data(did, proofOfWork, jwt, text, endpoint);
+            try {
+                await save_publish_data(did, proofOfWork, jwt, text, endpoint);
+            }
+            catch (e) {
+                reply.status(500).send("can not save data in Tier 2 DB");
+            }
 
             return reply.status(200).send();
         },
