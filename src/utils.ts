@@ -82,7 +82,7 @@ const parent_pubkey = debug_parent_wallet.address; // todo remove
 
 export const debug_parent_pubkey_PKH_did = "did:pkh:eip155:1:" + parent_pubkey;
 
-export let CURRENT_TIER1_REGISTRATION_JWT="";
+export let CURRENT_TIER1_REGISTRATION_JWT = "";
 
 
 export async function self_mesh_node_register() {
@@ -109,15 +109,15 @@ export async function self_mesh_node_register() {
 
     }
 
-  
-    
+
+
     //bookmark
 
 
     //    const their_pol = request.headers["proof-of-latency"];  //latency from our own node. 
 
 
-    try{
+    try {
 
         /*
     const postResult = await axios.post(
@@ -134,34 +134,34 @@ export async function self_mesh_node_register() {
     console.log("🚀 ~ file: utils.ts:126 ~ self_mesh_node_register ~ postResult:", postResult)
     */
 
-    
-    const options = {
-        method: 'POST',
-        headers: {
-          "Content-Type": "application/json",
-          'endpoint': env_get("my_endpoint"),
-          'proof-of-work-result': env_get("POW_ANSWER"),
-          'proof-of-latency': 'asdasd',
-          'did':get_my_did()
-        },
-        body: '{"a":"a"}'
-      };
-      
-      const res = await fetch(env_get("target_parent_tier1_endpoint")+"/register", options)
-      //TODO save this to global variable and start using this JWT in all communication with Tier1 node.
-      const res_text = await res.text();
-      if( res.status==200 && res_text  && res_text.length >0){
-        CURRENT_TIER1_REGISTRATION_JWT=res_text;
-        console.log("🚀 ~ file: utils.ts:145 ~ self_mesh_node_register ~ res_text:", res_text) 
-      }
-    
-      console.log("🚀 ~ file: utils.ts:130 ~ self_mesh_node_register ~ res.statusText:", res.statusText)
-      console.log("🚀 ~ file: utils.ts:130 ~ self_mesh_node_register ~ res.status:", res.status)
-   
+
+        const options = {
+            method: 'POST',
+            headers: {
+                "Content-Type": "application/json",
+                'endpoint': env_get("my_endpoint"),
+                'proof-of-work-result': env_get("POW_ANSWER"),
+                'proof-of-latency': 'asdasd',
+                'did': get_my_did()
+            },
+            body: '{"a":"a"}'
+        };
+
+        const res = await fetch(env_get("target_parent_tier1_endpoint") + "/register", options)
+        //TODO save this to global variable and start using this JWT in all communication with Tier1 node.
+        const res_text = await res.text();
+        if (res.status == 200 && res_text && res_text.length > 0) {
+            CURRENT_TIER1_REGISTRATION_JWT = res_text;
+            console.log("🚀 ~ file: utils.ts:145 ~ self_mesh_node_register ~ res_text:", res_text)
+        }
+
+        console.log("🚀 ~ file: utils.ts:130 ~ self_mesh_node_register ~ res.statusText:", res.statusText)
+        console.log("🚀 ~ file: utils.ts:130 ~ self_mesh_node_register ~ res.status:", res.status)
+
 
 
     }
-    catch(e){
+    catch (e) {
         console.log("🚀 ~ file: utils.ts:130 ~ self_mesh_node_register ~ e:", e)
         console.log("🚀 ~ file: utils.ts:130 ~ self_mesh_node_register ~ e.cause.errors:", e.cause.errors)
     }
@@ -199,6 +199,15 @@ export async function query_default_bootstrap_servers() {
     }
 }
 
+export async function verify_jwt(jwt: string) {
+    let resolver = new Resolver({ ...pkhDidResolver() });
+
+    return await didJWT.verifyJWT(jwt, {
+        resolver,
+        audience: debug_parent_pubkey_PKH_did
+    });
+}
+
 export async function verify_proof_of_latency(jwt: string) {
     const timestamp = Date.now();
 
@@ -206,42 +215,31 @@ export async function verify_proof_of_latency(jwt: string) {
     //TODO move to .env or config
     const deltaLatency = 100000000;
 
-    let resolver = new Resolver({ ...pkhDidResolver() });
-  
-    let verificationResponse = await didJWT.verifyJWT(jwt, {
-      resolver,
-      audience: debug_parent_pubkey_PKH_did
-    });
-  
-    let isverfied = false;
-  
-    if (verificationResponse.verified) {
-      isverfied = true;
+    const isJwtVerified = (await verify_jwt(jwt)).verified
+
+    if (!isJwtVerified) {
+        return { error: "Failed to verify hash" };
     }
-  
-    if (!isverfied) {
-      return { error: "Failed to verify hash" };
-    }
-  
+
     let { payload } = didJWT.decodeJWT(jwt)
-  
+
     const latency = timestamp - payload.latency_time_stamp_check;
     if (latency > deltaLatency) {
-      return { latency, error: `Proof of latency failed ${latency}` };
+        return { latency, error: `Proof of latency failed ${latency}` };
     }
-  
+
     let respondingJwt = await didJWT.createJWT(
-      {
-        name: 'register latency check',
-        latency_time_stamp_check: timestamp,
-        result_latency: latency,
-        request_ip: jwt
-      },
-      { issuer: debug_parent_pubkey_PKH_did, signer: debug_parent_privatekey_didJWTsigner },
-      { alg: 'ES256K' });
-  
+        {
+            name: 'register latency check',
+            latency_time_stamp_check: timestamp,
+            result_latency: latency,
+            request_ip: jwt
+        },
+        { issuer: debug_parent_pubkey_PKH_did, signer: debug_parent_privatekey_didJWTsigner },
+        { alg: 'ES256K' });
+
     return { respondingJwt, latency, error: `Proof of latency failed ${latency}` };
-  }
+}
 
 export async function register_latency_check(
     did: string, latency: number, ip: string, respondingJwt: string, requestingEndpoint: string) {
@@ -279,6 +277,28 @@ export async function register_latency_check(
     console.log("🚀 ~ file: utils.ts:101 ~ register_latency_check ~ data:", data)
 }
 
+export async function save_publish_data(
+    did: string, pow: string, jwt: string, text: string, endpoint: string) {
+    const tierDid = get_my_did();
+    const tierEndpoint = env_get("my_endpoint");
+
+    const data = await sql`INSERT INTO published_data(
+        user_did,
+        tier_did,
+        user_jwt,
+        user_pow,
+        user_endpoint,
+        tier_endpoint,
+        published_text
+        )
+        values (
+        ${did},${tierDid},${jwt},${pow},${endpoint},${tierEndpoint},${text}
+        )
+        `;
+
+    console.log("🚀 ~ file: utils.ts:280 ~ save_publish_data ~ data:", data)
+}
+
 
 export async function json_to_cid(data: object) {
 
@@ -303,7 +323,7 @@ export async function sign_data_jwt(data: object) {
 
 const constr = env_get("MY_PG_DATABASE_PSQL");
 //@ts-ignore
-const sql = postgres(constr,{ ssl: 'require'})
+const sql = postgres(constr, { ssl: 'require' })
 //const sql = neon(env_get("MY_PG_DATABASE_URL")!);
 
 const testsql1 = await sql`select now();`
@@ -328,6 +348,21 @@ const heartbeat_latency_hist_tbl = await sql`create table  IF NOT EXISTS heartbe
   ) ;
 `
 console.log("🚀 ~ file: utils.ts:196 ~ mesh_node_registry_tbl:", heartbeat_latency_hist_tbl)
+
+
+const published_data_tbl = await sql`create table  IF NOT EXISTS published_data (
+    id bigint generated by default as identity,
+    created_at timestamp with time zone not null default now(),
+    user_did text null,
+    tier_did text null,
+    user_jwt text null,
+    user_pow text null,
+    user_endpoint text null,
+    tier_endpoint text null,
+    published_text text null
+  ) ;
+`
+console.log("🚀 ~ file: utils.ts:331 ~ published_data_tbl:", published_data_tbl)
 
 
 const mesh_node_registry_tbl = await sql`create table  IF NOT EXISTS mesh_node_registry (
@@ -407,11 +442,11 @@ export async function add_fed_data_binary(data: Uint8Array, cid: string, author_
     console.log("🚀 ~ file: utils.ts:188 ~ add_fed_data_binary ~ sql_ret:", sql_ret)
 }
 
-export async function insert_into_mesh_node_registry(did: string, endpoint: string ) {
-    const sql_ret = await sql`insert into mesh_node_registry (did, endpoint) values (${did}, ${endpoint})`  
+export async function insert_into_mesh_node_registry(did: string, endpoint: string) {
+    const sql_ret = await sql`insert into mesh_node_registry (did, endpoint) values (${did}, ${endpoint})`
     console.log("🚀 ~ file: utils.ts:303 ~ insert_into_mesh_node_registry ~ sql_ret:", sql_ret)
 }
-   
+
 
 async function getRandomEndpoint() {
     try {
@@ -421,9 +456,9 @@ async function getRandomEndpoint() {
         const randomEndpointPerDid = ENDPOINTS_PER_DID[Math.floor(Math.random() * ENDPOINTS_PER_DID.length)]
 
         if (randomEndpointPerDid.endpoint) {
-            return randomEndpointPerDid.endpoint.endsWith('/') 
-            ? randomEndpointPerDid.endpoint.slice(0, -1) 
-            : randomEndpointPerDid.endpoint;
+            return randomEndpointPerDid.endpoint.endsWith('/')
+                ? randomEndpointPerDid.endpoint.slice(0, -1)
+                : randomEndpointPerDid.endpoint;
         }
     }
     catch (e) {
@@ -472,52 +507,53 @@ export async function check_heartbeat() {
 
 
 
-export async  function  verify_argon_pow(answerHash:string,their_did:string){ //TODO make the number of 00000 variable 
-    console.log("🚀 ~ file: utils.ts:418 ~ verify_argon_pow ~ input  "+  their_did+" "+get_my_did())
+export async function verify_proof_of_work(answerHash: string, their_did: string) { //TODO make the number of 00000 variable 
     const lastPart = answerHash.substring(answerHash.lastIndexOf('$') + 1, answerHash.length);
     const answerHex = Buffer.from(lastPart, 'base64').toString('hex');
-    console.log("🚀 ~ file: utils.ts:121 ~ self_mesh_node_register ~ answerHex:", answerHex)
+    console.log("🚀 ~ file: utils.ts:513 ~ verify_proof_of_work ~ answerHex:", answerHex)
 
-    if( (answerHex.match(/0000/g) || []).length > 0) {
-    
-    const isValid = await argon2Verify({
-      password: get_my_did()+their_did,
-      hash: answerHash,
-    });
-    console.log("🚀 ~ file: utils.ts:428 ~ verify_argon_pow ~ isValid:", isValid)
-    return isValid;
+    const proofOfWorkChallenge = new RegExp(env_get("POW_CHALLENGE") ?? "0000", "g")
+    if ((answerHex.match(proofOfWorkChallenge) || []).length > 0) {
+        const isVerified = await argon2Verify({
+            password: get_my_did() + their_did,
+            hash: answerHash,
+        });
+            console.log("🚀 ~ file: utils.ts:522 ~ verify_proof_of_work ~ get_my_did():", get_my_did())
+            console.log("🚀 ~ file: utils.ts:522 ~ verify_proof_of_work ~ their_did:", their_did)
+        console.log("🚀 ~ file: utils.ts:524 ~ verify_proof_of_work ~ isVerified:", isVerified)
+        return isVerified;
     }
-    else 
-        return false;
-  }
+
+    return false;
+}
 
 
 
-if( env_get("target_parent_tier1_endpoint").substring(0,4)!== "http"){
-    env_set("target_parent_tier1_endpoint","https://"+env_get("target_parent_tier1_endpoint"))
-    console.log(" automatically prepended https://  to your Tier1 endpoint b/c it was missing. it is now target_parent_tier1_endpoint= "+env_get("target_parent_tier1_endpoint"))
+if (env_get("target_parent_tier1_endpoint").substring(0, 4) !== "http") {
+    env_set("target_parent_tier1_endpoint", "https://" + env_get("target_parent_tier1_endpoint"))
+    console.log(" automatically prepended https://  to your Tier1 endpoint b/c it was missing. it is now target_parent_tier1_endpoint= " + env_get("target_parent_tier1_endpoint"))
     //TODO do a check that https is working on the node 
 }
 
 
 
-if( env_get("my_endpoint").substring(0,4)!== "http"){
-    env_set("my_endpoint","https://"+env_get("my_endpoint"))
-    console.log(" automatically prepended https://  to your Self endpoint b/c it was missing. it is now  my_endpoint= "+env_get("my_endpoint"))
+if (env_get("my_endpoint").substring(0, 4) !== "http") {
+    env_set("my_endpoint", "https://" + env_get("my_endpoint"))
+    console.log(" automatically prepended https://  to your Self endpoint b/c it was missing. it is now  my_endpoint= " + env_get("my_endpoint"))
     //TODO do a check that https is working on the node 
 }
 
 
 
-if(!env_get("POW_ANSWER")){  
+if (!env_get("POW_ANSWER")) {
 
 
 
     const target_parent_tier1_endpoint = env_get('target_parent_tier1_endpoint');
     const target_parent_tier1_did = env_get('target_parent_tier1_did');
-    console.log("🚀 ~ file: utils.ts:113 ~ self_mesh_node_register ~ pow inputs:"+ target_parent_tier1_did+" "+get_my_did() )
+    console.log("🚀 ~ file: utils.ts:113 ~ self_mesh_node_register ~ pow inputs:" + target_parent_tier1_did + " " + get_my_did())
 
-    const {answerHash}= await do_proofOfWork(target_parent_tier1_did,get_my_did() )  
+    const { answerHash } = await do_proofOfWork(target_parent_tier1_did, get_my_did())
     console.log("🚀 ~ file: utils.ts:115 ~ self_mesh_node_register ~ answerHash:", answerHash)
 
 
@@ -529,15 +565,15 @@ if(!env_get("POW_ANSWER")){
     const isValid = await argon2Verify({
         password: target_parent_tier1_did + get_my_did(),
         hash: answerHash,
-      });
+    });
     console.log("🚀 ~ file: utils.ts:122 ~ self_mesh_node_register ~ isValid:", isValid)
 
-    env_set("POW_ANSWER",answerHash)
+    env_set("POW_ANSWER", answerHash)
 }
- 
-  
 
-console.log(" env var POW_ANSWER: " +  env_get("POW_ANSWER"));
-console.log("Server my_did: " +  get_my_did());
+
+
+console.log(" env var POW_ANSWER: " + env_get("POW_ANSWER"));
+console.log("Server my_did: " + get_my_did());
 
 //await self_mesh_node_register()

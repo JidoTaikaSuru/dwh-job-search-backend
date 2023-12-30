@@ -2,6 +2,7 @@ import { FastifyInstance, FastifyServerOptions } from "fastify";
 import { argon2Verify, argon2id } from "hash-wasm";
 import { agent, DEFAULT_IDENTIFIER_SCHEMA } from "../setup.js";
 import { Buffer } from 'node:buffer';
+import { get_my_did } from "../utils.js";
 
 export type ProofOfWorkHeaders = {
   "x-challenge-hash": string;
@@ -40,9 +41,10 @@ export default async function proofOfWorkRoutes(
           .send("You passed the same authorization header more than once");
       }
 
-      const { did } = await agent.didManagerGetByAlias({
+      const did = get_my_did();
+      /* const { did } = await agent.didManagerGetByAlias({
         alias: DEFAULT_IDENTIFIER_SCHEMA,
-      });
+      }); */
 
       const isValid = await argon2Verify({
         password: did + clientDid,
@@ -81,9 +83,10 @@ export default async function proofOfWorkRoutes(
             .send("You passed the same authorization header more than once");
         }
 
-        const { did } = await agent.didManagerGetByAlias({
+        /* const { did } = await agent.didManagerGetByAlias({
           alias: DEFAULT_IDENTIFIER_SCHEMA,
-        });
+        }); */
+        const did = get_my_did();
 
         return reply.status(200).send({ serverDid: did });
       },

@@ -10,7 +10,7 @@ import {
   insert_into_mesh_node_registry,
   register_latency_check,
   sign_data_jwt,
-  verify_argon_pow,
+  verify_proof_of_work,
   verify_proof_of_latency
 } from "../utils.js";
 
@@ -63,7 +63,7 @@ export default async function registerApi(
       register_latency_check(their_did, latency, request.ip, respondingJwt, their_endpoint);
 
       //@ts-ignore
-      const correctpow = await verify_argon_pow(their_pow, their_did)
+      const correctpow = await verify_proof_of_work(their_pow, their_did)
       console.log("🚀 ~ file: register.ts:51 ~ handler: ~ correctpow:", correctpow)
 
       if (correctpow) {
