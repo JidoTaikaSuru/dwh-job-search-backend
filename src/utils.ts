@@ -9,6 +9,9 @@ import * as multiformats_json from 'multiformats/codecs/json'
 import { sha256 } from 'multiformats/hashes/sha2'
 import postgres from 'postgres'
 import { do_proofOfWork } from './proofOfWork/index.js';
+import { getResolver as pkhDidResolver } from "pkh-did-resolver";
+import { Resolver } from "did-resolver";
+
 
 
 //import { neon } from '@neondatabase/serverless';
@@ -197,6 +200,50 @@ export async function query_default_bootstrap_servers() {
         console.error("Error: Could not load endpoints per DID", e)
     }
 }
+
+export async function verify_proof_of_latency(jwt: string) {
+    const timestamp = Date.now();
+
+    // latency delta in miliseconds(?)
+    //TODO move to .env or config
+    const deltaLatency = 100000000;
+
+    let resolver = new Resolver({ ...pkhDidResolver() });
+  
+    let verificationResponse = await didJWT.verifyJWT(jwt, {
+      resolver,
+      audience: debug_parent_pubkey_PKH_did
+    });
+  
+    let isverfied = false;
+  
+    if (verificationResponse.verified) {
+      isverfied = true;
+    }
+  
+    if (!isverfied) {
+      return { error: "Failed to verify hash" };
+    }
+  
+    let { payload } = didJWT.decodeJWT(jwt)
+  
+    const latency = timestamp - payload.latency_time_stamp_check;
+    if (latency > deltaLatency) {
+      return { latency, error: `Proof of latency failed ${latency}` };
+    }
+  
+    let respondingJwt = await didJWT.createJWT(
+      {
+        name: 'register latency check',
+        latency_time_stamp_check: timestamp,
+        result_latency: latency,
+        request_ip: jwt
+      },
+      { issuer: debug_parent_pubkey_PKH_did, signer: debug_parent_privatekey_didJWTsigner },
+      { alg: 'ES256K' });
+  
+    return { respondingJwt, latency, error: `Proof of latency failed ${latency}` };
+  }
 
 export async function register_latency_check(
     did: string, latency: number, ip: string, respondingJwt: string, requestingEndpoint: string) {

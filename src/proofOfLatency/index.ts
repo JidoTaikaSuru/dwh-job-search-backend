@@ -1,15 +1,10 @@
 import * as didJWT from 'did-jwt'; //NEW WINNER  didJWT.ES256KSigner(didJWT.hexToBytes(debug_parent_privatekey))  
-import { Resolver } from "did-resolver";
 import { FastifyInstance, FastifyServerOptions } from "fastify";
-import { getResolver as pkhDidResolver } from "pkh-did-resolver";
-import { debug_parent_pubkey_PKH_did, debug_parent_privatekey_didJWTsigner, register_latency_check } from "../utils.js";
+import { debug_parent_pubkey_PKH_did, debug_parent_privatekey_didJWTsigner, register_latency_check, verify_proof_of_latency } from "../utils.js";
 
 export type ProofOfLatencyHeaders = {
   "x-jwt": string;
 };
-
-// latency delta in miliseconds(?)
-const deltaLatency = 100000000;
 
 export default async function proofOfLatencyRoutes(
   server: FastifyInstance,
@@ -31,7 +26,6 @@ export default async function proofOfLatencyRoutes(
     },
 
     handler: async (request, reply) => {
-      const timestamp = Date.now();
       const jwt = request.headers["x-jwt"];
       const did = request.headers["x-did"];
       const endpoint = request.headers["x-endpoint"];
@@ -46,41 +40,15 @@ export default async function proofOfLatencyRoutes(
           .send("You passed the same authorization header more than once");
       }
 
-      let resolver = new Resolver({ ...pkhDidResolver() });
-      
-      let verificationResponse = await didJWT.verifyJWT(jwt, {
-        resolver,
-        audience: debug_parent_pubkey_PKH_did
-      });
-      
-      let isverfied = false;
+      const { latency, error, respondingJwt } = await verify_proof_of_latency(jwt)
 
-      if (verificationResponse.verified) {
-        isverfied = true;
+      if (!latency || error) {
+        return reply
+          .status(401)
+          .send(error);
       }
 
-      if (!isverfied) {
-        return reply.status(401).send("Failed to verify hash");
-      }
-
-      let { payload } = didJWT.decodeJWT(jwt)
-
-      const currentLatency = timestamp - payload.latency_time_stamp_check;
-            if (currentLatency > deltaLatency) {
-        return reply.status(401).send(`Proof of latency failed ${currentLatency}`);
-      }
-
-      let respondingJwt = await didJWT.createJWT(
-        {
-          name: 'register latency check',
-          latency_time_stamp_check: timestamp,
-          result_latency: currentLatency,
-          request_ip: request.ip
-        },
-        { issuer: debug_parent_pubkey_PKH_did, signer: debug_parent_privatekey_didJWTsigner },
-        { alg: 'ES256K' });
-            
-      register_latency_check(did, currentLatency, request.ip, respondingJwt, endpoint);
+      register_latency_check(did, latency, request.ip, respondingJwt, endpoint);
 
       reply.status(200).send();
     },
@@ -102,3 +70,4 @@ export default async function proofOfLatencyRoutes(
       },
     });
 }
+
