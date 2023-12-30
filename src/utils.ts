@@ -1,7 +1,7 @@
 import * as dag_json from '@ipld/dag-json';
 import { createClient } from '@supabase/supabase-js';
 import axios from 'axios';
-import * as didJWT from 'did-jwt'; //NEW WINNER  didJWT.ES256KSigner(didJWT.hexToBytes(debug_parent_privatekey))  
+import * as didJWT from 'did-jwt'; //NEW WINNER  didJWT.ES256KSigner(didJWT.hexToBytes(debug_parent_privatekey))
 import { Resolver } from 'did-resolver';
 import { ethers } from 'ethers';
 import { argon2Verify } from 'hash-wasm';
