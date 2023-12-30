@@ -41,6 +41,7 @@ import { KeyManagementSystem, SecretBox } from "@veramo/kms-local";
 // Custom resolvers
 import { Resolver } from "did-resolver";
 import dotenv from "dotenv";
+import { ethers } from "ethers";
 import { getResolver as ethrDidResolver } from "ethr-did-resolver";
 import { DataSource } from "typeorm";
 import { getResolver as webDidResolver } from "web-did-resolver";
@@ -51,7 +52,6 @@ import {
   query_default_bootstrap_servers, 
   self_mesh_node_register, 
   set_interval_heartbeat_check_job } from "./utils.js";
-import { ethers } from "ethers";
 // Storage plugin using TypeOrm
 
 // TypeORM is installed with `@veramo/data-store`

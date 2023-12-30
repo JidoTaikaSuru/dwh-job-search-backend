@@ -85,23 +85,22 @@ export let CURRENT_TIER1_REGISTRATION_JWT = "";
 
 export async function self_mesh_node_register() {
     let cur_ip;
-    //@ts-ignore
     if (!env_get("my_endpoint")?.includes("localhost")) {
         const options = { method: 'GET', headers: { 'Content-Type': 'application/json', "User-Agent": "curl/7.64.1" } };
         let res = await (await fetch('http://ipinfo.io/', options)).json();
 
-        //@ts-ignore
+        //@ts-expect-error don't know
         if (!res || res?.ip) {
 
             res = await (await fetch('http://ifconfig.me/all.json', options)).json();
-            //@ts-ignore
+            //@ts-expect-error don't know
             if (res.ip_addr) {
-                //@ts-ignore
+                //@ts-expect-error don't know
                 res.ip = res.ip_addr;
             }
         }
 
-        //@ts-ignore
+        //@ts-expect-error don't know
         if (res && res.ip)
             cur_ip = res;
 
@@ -298,7 +297,6 @@ export async function sign_data_jwt(data: object) {
 
 
 const constr = env_get("MY_PG_DATABASE_PSQL");
-//@ts-ignore
 const sql = postgres(constr, { ssl: 'require' })
 //const sql = neon(env_get("MY_PG_DATABASE_URL")!);
 

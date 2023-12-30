@@ -1,7 +1,7 @@
+import keyto from '@trust/keyto';
 import dotenv from 'dotenv';
 import * as ethers from 'ethers';
 import * as jose from 'jose';
-import keyto from '@trust/keyto';
 import { JWK } from 'jose';
 
 dotenv.config();

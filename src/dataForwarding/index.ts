@@ -5,9 +5,9 @@ import * as ethers from 'ethers';
 import { FastifyInstance, FastifyServerOptions } from 'fastify';
 import { sha256 } from 'hash-wasm';
 import * as jose from 'jose';
+import { JWK } from 'jose';
 import { supabaseClient } from '../index.js';
 //import { registerApi } from './register.js';
-import { JWK } from 'jose';
 
 
 dotenv.config();

@@ -1,3 +1,4 @@
+import keyto from '@trust/keyto';
 import dotenv from 'dotenv';
 import * as ethers from 'ethers';
 import { FastifyInstance, FastifyServerOptions } from 'fastify';
@@ -5,7 +6,6 @@ import { FastifyInstance, FastifyServerOptions } from 'fastify';
 import * as jose from 'jose';
 import { JWK } from 'jose';
 
-import keyto from '@trust/keyto';
 
 
 dotenv.config();
