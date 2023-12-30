@@ -14,9 +14,7 @@ import jobListingRoutes from './job_listing/index.js';
 import jobReplyRoutes from './job_reply/index.js';
 import presentationRoutes from './presentation/index.js';
 import proofOfLatencyRoutes from './proofOfLatency/index.js';
-import proofOfWorkRoutes from './proofOfWork/index.js';
 import userRoutes from './user/index.js';
-import publishApi from './publish/index.js';
 
 export const supabaseClient = createClient<Database>(
   'https://api.gotid.org',
@@ -70,22 +68,22 @@ export const JWT_HEADER = {
     'x-access-token': { type: 'string' },
   },
   required: ['x-access-token'],
-}
+};
 export const JWT_HEADER_SCHEMA = {
   schema: {
     headers: JWT_HEADER,
-  }
-}
+  },
+};
 export const JWT_HEADER_SCHEMA_AND_PREHANDLER = {
   schema: {
     headers: JWT_HEADER,
   },
   preHandler: jwtAuthentication,
-}
+};
 
-export const init =  () => {
+export const init = () => {
   const server = fastify({
-    logger: true
+    logger: true,
   });
   server.register(cors, {
     origin: '*',
@@ -95,7 +93,6 @@ export const init =  () => {
   server.register(companyRoutes);
   server.register(jobListingRoutes);
   server.register(identifierRoutes); // You can ignore these routes, see identifiers/* for details
-  server.register(proofOfWorkRoutes);
   server.register(proofOfLatencyRoutes);
   server.register(dataForwarding);
   server.register(forwarding);
@@ -105,14 +102,13 @@ export const init =  () => {
   server.register(rwoRoute);
   server.register(acceptData);
   server.register(registerApi);
-  server.register(publishApi);
 
   // server.get('/', async (request, reply) => {
   //   return reply.send(rustLib.hello());
   // })
 
-  return server
-}
+  return server;
+};
 //
 // if (require.main === module) {
 //   // called directly i.e. "node app"

@@ -1,17 +1,15 @@
-import * as dag_json from '@ipld/dag-json'
-import { createClient } from '@supabase/supabase-js'
-import axios from "axios";
+import * as dag_json from '@ipld/dag-json';
+import { createClient } from '@supabase/supabase-js';
+import axios from 'axios';
 import * as didJWT from 'did-jwt'; //NEW WINNER  didJWT.ES256KSigner(didJWT.hexToBytes(debug_parent_privatekey))  
+import { Resolver } from 'did-resolver';
 import { ethers } from 'ethers';
-import { argon2Verify } from "hash-wasm";
-import { CID } from 'multiformats'
-import * as multiformats_json from 'multiformats/codecs/json'
-import { sha256 } from 'multiformats/hashes/sha2'
-import postgres from 'postgres'
-import { do_proofOfWork } from './proofOfWork/index.js';
-import { getResolver as pkhDidResolver } from "pkh-did-resolver";
-import { Resolver } from "did-resolver";
-
+import { argon2Verify } from 'hash-wasm';
+import { CID } from 'multiformats';
+import * as multiformats_json from 'multiformats/codecs/json';
+import { sha256 } from 'multiformats/hashes/sha2';
+import { getResolver as pkhDidResolver } from 'pkh-did-resolver';
+import postgres from 'postgres';
 
 
 //import { neon } from '@neondatabase/serverless';
@@ -62,7 +60,7 @@ export function get_my_private_key() {
 }
 
 
-let tmpkey = get_my_private_key();
+const tmpkey = get_my_private_key();
 const my_ethers_wallet = tmpkey ? new ethers.Wallet(tmpkey) : await ethers.Wallet.createRandom();
 export const my_private_key = my_ethers_wallet.privateKey;
 export const my_pub_key = my_ethers_wallet.address;
@@ -200,7 +198,7 @@ export async function query_default_bootstrap_servers() {
 }
 
 export async function verify_jwt(jwt: string) {
-    let resolver = new Resolver({ ...pkhDidResolver() });
+    const resolver = new Resolver({ ...pkhDidResolver() });
 
     return await didJWT.verifyJWT(jwt, {
         resolver,
@@ -221,14 +219,14 @@ export async function verify_proof_of_latency(jwt: string) {
         return { error: "Failed to verify hash" };
     }
 
-    let { payload } = didJWT.decodeJWT(jwt)
+    const { payload } = didJWT.decodeJWT(jwt)
 
     const latency = timestamp - payload.latency_time_stamp_check;
     if (latency > deltaLatency) {
         return { latency, error: `Proof of latency failed ${latency}` };
     }
 
-    let respondingJwt = await didJWT.createJWT(
+    const respondingJwt = await didJWT.createJWT(
         {
             name: 'register latency check',
             latency_time_stamp_check: timestamp,
@@ -275,28 +273,6 @@ export async function register_latency_check(
         `;
 
     console.log("🚀 ~ file: utils.ts:101 ~ register_latency_check ~ data:", data)
-}
-
-export async function save_publish_data(
-    did: string, pow: string, jwt: string, text: string, endpoint: string) {
-    const tierDid = get_my_did();
-    const tierEndpoint = env_get("my_endpoint");
-
-    const data = await sql`INSERT INTO published_data(
-        user_did,
-        tier_did,
-        user_jwt,
-        user_pow,
-        user_endpoint,
-        tier_endpoint,
-        published_text
-        )
-        values (
-        ${did},${tierDid},${jwt},${pow},${endpoint},${tierEndpoint},${text}
-        )
-        `;
-
-    console.log("🚀 ~ file: utils.ts:280 ~ save_publish_data ~ data:", data)
 }
 
 
@@ -542,35 +518,6 @@ if (env_get("my_endpoint").substring(0, 4) !== "http") {
     console.log(" automatically prepended https://  to your Self endpoint b/c it was missing. it is now  my_endpoint= " + env_get("my_endpoint"))
     //TODO do a check that https is working on the node 
 }
-
-
-
-if (!env_get("POW_ANSWER")) {
-
-
-
-    const target_parent_tier1_endpoint = env_get('target_parent_tier1_endpoint');
-    const target_parent_tier1_did = env_get('target_parent_tier1_did');
-    console.log("🚀 ~ file: utils.ts:113 ~ self_mesh_node_register ~ pow inputs:" + target_parent_tier1_did + " " + get_my_did())
-
-    const { answerHash } = await do_proofOfWork(target_parent_tier1_did, get_my_did())
-    console.log("🚀 ~ file: utils.ts:115 ~ self_mesh_node_register ~ answerHash:", answerHash)
-
-
-    const lastPart = answerHash.substring(answerHash.lastIndexOf('$') + 1, answerHash.length);
-    const answerHex = Buffer.from(lastPart, 'base64').toString('hex');
-    console.log("🚀 ~ file: utils.ts:121 ~ self_mesh_node_register ~ answerHex:", answerHex)
-
-
-    const isValid = await argon2Verify({
-        password: target_parent_tier1_did + get_my_did(),
-        hash: answerHash,
-    });
-    console.log("🚀 ~ file: utils.ts:122 ~ self_mesh_node_register ~ isValid:", isValid)
-
-    env_set("POW_ANSWER", answerHash)
-}
-
 
 
 console.log(" env var POW_ANSWER: " + env_get("POW_ANSWER"));
